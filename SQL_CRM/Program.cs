@@ -208,56 +208,6 @@ namespace SQL_CRM
             return new Customer(firstName, lastName, Email, PhoneNumber);
         }
 
-        
-
-        private static Customer CreateCustomerFromSqlReader(SqlDataReader reader)
-        {
-            string email = null;
-            string phoneNumber = null;
-            var id = reader.GetInt32(0);
-            var firstName = reader.GetString(1);
-            var lastName = reader.GetString(2);
-
-            try
-            {
-                email = reader.GetString(3);
-            }
-            catch (Exception e)
-            {
-            }
-
-            try
-            {
-                phoneNumber = reader.GetString(4);
-            }
-            catch (Exception e)
-            {
-            }
-
-            return new Customer(id, firstName, lastName, email, phoneNumber);
-        }
-
-        private static List<Customer> GetCustomers(Action<SqlCommand> setParameters,
-            Func<SqlDataReader, Customer> createCustomer, string sql)
-        {
-            var list = new List<Customer>();
-
-            _dbManager.Query(sql, (command) =>
-            {
-                setParameters(command);
-
-                var reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    list.Add(createCustomer(reader));
-                }
-
-            });
-
-            return list;
-        }
-
         private static void SystemMessage(string message)
         {
             mainWindow.Add(new WebMessage("System", message));
