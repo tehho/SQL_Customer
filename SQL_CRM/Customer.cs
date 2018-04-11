@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Runtime.ExceptionServices;
 
 namespace SQL_CRM
@@ -13,7 +14,7 @@ namespace SQL_CRM
         public string PhoneNumber { get; set; }
 
         public Customer()
-            : this(-1, "UNKNOWN", "UNKNOWN","", "")
+            : this(null, null, null, null, null)
         {
         }
 

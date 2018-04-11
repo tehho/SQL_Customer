@@ -51,23 +51,26 @@ namespace SQL_CRM
 
         public void CreateCustomer(Customer customer)
         {
-            var sqlQuery = $"INSERT INTO Customer (FirstName, LastName";
+            var sql = $"DECLARE @CustomerId int " +
+                      $"INSERT INTO Customer (FirstName, LastName";
 
             if (customer.Email != null)
-                sqlQuery += ", Email";
-            if (customer.PhoneNumber != null)
-                sqlQuery += ", PhoneNr";
+                sql += ", Email";
 
-            sqlQuery += $") VALUES (@FName, @LName";
+            sql += $") VALUES (@FName, @LName";
 
             if (customer.Email != null)
-                sqlQuery += ", @Email";
+                sql += ", @Email";
+
+            sql += ");" +
+                   "SELECT @CustomerId = SCOPE_IDENTITY();";
+
             if (customer.PhoneNumber != null)
-                sqlQuery += ", @PhoneNr";
+            {
+                sql += " INSERT INTO PhoneNr (PhoneNr.PhoneNr, PhoneNr.CustomerId) VALUES (@PhoneNr, @CustomerId)";
+            }
 
-            sqlQuery += ")";
-
-            Query(sqlQuery,
+            Query(sql,
                 (command) =>
                 {
                     command.Parameters.Add(new SqlParameter("FName", customer.FirstName));
@@ -121,34 +124,46 @@ namespace SQL_CRM
             var where = new List<string>();
             Action<SqlCommand> setParameters = null;
 
-            if (customer.FirstName != null)
+            if (customer != null)
             {
-                where.Add("Customer.FirstName = @FName");
-                setParameters += (command) => { command.Parameters.Add(new SqlParameter("FName", customer.FirstName)); };
-            }
-            if (customer.LastName != null)
-            {
-                where.Add("Customer.LastName = @LName");
-                setParameters += (command) => { command.Parameters.Add(new SqlParameter("LName", customer.LastName)); };
-            }
-            if (customer.Email != null)
-            {
-                where.Add("Customer.Email = @Email");
-                setParameters += (command) => { command.Parameters.Add(new SqlParameter("Email", customer.Email)); };
-            }
-
-            if (customer.PhoneNumber != null)
-            {
-                where.Add("PhoneNr.PhoneNr = @PhoneNr");
-                setParameters += (command) =>
+                if (customer.FirstName != null)
                 {
-                    command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
-                };
+                    where.Add("Customer.FirstName = @FName");
+                    setParameters += (command) =>
+                    {
+                        command.Parameters.Add(new SqlParameter("FName", customer.FirstName));
+                    };
+                }
+
+                if (customer.LastName != null)
+                {
+                    where.Add("Customer.LastName = @LName");
+                    setParameters += (command) =>
+                    {
+                        command.Parameters.Add(new SqlParameter("LName", customer.LastName));
+                    };
+                }
+
+                if (customer.Email != null)
+                {
+                    where.Add("Customer.Email = @Email");
+                    setParameters += (command) =>
+                    {
+                        command.Parameters.Add(new SqlParameter("Email", customer.Email));
+                    };
+                }
+
+                if (customer.PhoneNumber != null)
+                {
+                    where.Add("PhoneNr.PhoneNr = @PhoneNr");
+                    setParameters += (command) =>
+                    {
+                        command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
+                    };
+                }
             }
 
-            var sql = "SELECT [Customer.Id], [Customer.FirstName], [Customer.LastName], [Customer.Email], [PhoneNr.PhoneNr] FROM Customer";
-
-            sql += " LEFT JOIN PhoneNr ON Customer.Id = PhoneNr.CustomerId";
+            var sql = "SELECT [Customer.Id], [Customer.FirstName], [Customer.LastName], [Customer.Email], [PhoneNr.PhoneNr] FROM Customer LEFT JOIN PhoneNr ON Customer.Id = PhoneNr.CustomerId";
             if (where.Count != 0)
             {
                 sql += " Where " + string.Join(" and ", where);
@@ -171,7 +186,8 @@ namespace SQL_CRM
 
         public List<Customer> GetAllCustomer()
         {
-            return GetCustomers("SELECT * FROM Customer", null, CreateCustomerFromSqlReader);
+            //TODO Behöver lägga till left join på PhonrNr här också?
+            return GetCustomersFromCustomer(null);
         }
 
         private List<Customer> GetCustomers(string sql, Action<SqlCommand> setParameter, Func<SqlDataReader, Customer> readerMethod)
