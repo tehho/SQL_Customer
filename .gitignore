@@ -1,0 +1,9 @@
+.vs/
+[Bb]in
+[Oo]bj
+*.xml
+*.dll
+*.nupkg
+*.targets
+*.props
+*.config
