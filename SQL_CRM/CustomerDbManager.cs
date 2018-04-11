@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 using System;
+using System.Runtime.InteropServices;
 
 namespace SQL_CRM
 {
@@ -83,42 +84,89 @@ namespace SQL_CRM
 
         public List<Customer> GetCustomerFromFirstName(string firstName)
         {
-            return GetCustomers("SELECT * FROM Customer WHERE FirstName = @firstName ",
-                command =>
-                {
-                    command.Parameters.Add(new SqlParameter("firstName ", firstName));
-                },
-                CreateCustomerFromSqlReader);
+            return GetCustomersFromCustomer(new Customer()
+            {
+                FirstName = firstName
+            });
         }
 
         public List<Customer> GetCustomerFromLastName(string lastName)
         {
-            return GetCustomers("SELECT * FROM Customer WHERE LastName = @lastName",
-                command =>
-                {
-                    command.Parameters.Add(new SqlParameter("LastName", lastName));
-                },
-                CreateCustomerFromSqlReader);
+            return GetCustomersFromCustomer(new Customer()
+            {
+                LastName = lastName
+            });
         }
 
         public List<Customer> GetCustomerFromEmail(string email)
         {
-            return GetCustomers("SELECT * FROM Customer WHERE Email = @Email",
-                command =>
-                {
-                    command.Parameters.Add(new SqlParameter("Email", email));
-                },
-                CreateCustomerFromSqlReader);
+            return GetCustomersFromCustomer(new Customer()
+            {
+                Email = email
+            });
         }
 
         public List<Customer> GetCustomerFromPhoneNumber(string phoneNumber)
         {
-            return GetCustomers("SELECT * FROM Customer WHERE PhoneNr = @PhoneNr",
-                command =>
+            return GetCustomersFromCustomer(new Customer()
+            {
+                PhoneNumber = phoneNumber
+            });
+        }
+
+        public List<Customer> GetCustomersFromCustomer(Customer customer)
+        {
+            var list = new List<Customer>();
+
+            var where = new List<string>();
+            Action<SqlCommand> setParameters = null;
+
+            if (customer.FirstName != null)
+            {
+                where.Add("Customer.FirstName = @FName");
+                setParameters += (command) => { command.Parameters.Add(new SqlParameter("FName", customer.FirstName)); };
+            }
+            if (customer.LastName != null)
+            {
+                where.Add("Customer.LastName = @LName");
+                setParameters += (command) => { command.Parameters.Add(new SqlParameter("LName", customer.LastName)); };
+            }
+            if (customer.Email != null)
+            {
+                where.Add("Customer.Email = @Email");
+                setParameters += (command) => { command.Parameters.Add(new SqlParameter("Email", customer.Email)); };
+            }
+
+            if (customer.PhoneNumber != null)
+            {
+                where.Add("PhoneNr.PhoneNr = @PhoneNr");
+                setParameters += (command) =>
                 {
-                    command.Parameters.Add(new SqlParameter("PhoneNr", phoneNumber));
-                },
-                CreateCustomerFromSqlReader);
+                    command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
+                };
+            }
+
+            var sql = "SELECT [Customer.Id], [Customer.FirstName], [Customer.LastName], [Customer.Email], [PhoneNr.PhoneNr] FROM Customer";
+
+            sql += " LEFT JOIN PhoneNr ON Customer.Id = PhoneNr.CustomerId";
+            if (where.Count != 0)
+            {
+                sql += " Where " + string.Join(" and ", where);
+            }
+
+
+            Query(sql, (command) =>
+            {
+                setParameters?.Invoke(command);
+
+                var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(CreateCustomerFromSqlReader(reader));
+                }
+            });
+
+            return list;
         }
 
         public List<Customer> GetAllCustomer()

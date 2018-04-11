@@ -14,6 +14,8 @@ namespace SQL_CRM
 
         public void Query(string sqlQuery, Action<SqlCommand> method)
         {
+
+
             using (SqlConnection con = new SqlConnection(ConString))
             using (SqlCommand command = new SqlCommand(sqlQuery, con))
             {
