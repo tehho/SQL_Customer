@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
-using System;
-using System.Runtime.InteropServices;
 
 namespace SQL_CRM
 {
@@ -193,7 +192,6 @@ namespace SQL_CRM
 
         public List<Customer> GetAllCustomer()
         {
-            //TODO Behöver lägga till left join på PhonrNr här också?
             return GetCustomersFromCustomer(null);
         }
 

@@ -104,6 +104,7 @@ namespace SQL_CRM
 
         private static Customer ChangeCustomer(Customer customer)
         {
+            //new Question("Förnamn", "FirstName,Förnamn,Namn", "LastName,Efternamn,Surname");
             SystemMessage("1. Förnamn");
             SystemMessage("2. Efternamn");
             SystemMessage("3. Epost");
