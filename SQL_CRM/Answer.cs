@@ -11,7 +11,7 @@ namespace SQL_CRM
 
         public Answer(string possibleAnswers)
         {
-            this.possibleAnswers = possibleAnswers.Split(',').Where(item => !string.IsNullOrEmpty(item)).ToList();
+            this.possibleAnswers = possibleAnswers.Split(',').Where(item => !string.IsNullOrEmpty(item.Trim())).ToList();
         }
 
         public bool Check(string input)

@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2011
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQL_CRM", "SQL_CRM\SQL_CRM.csproj", "{24006E1F-6845-461C-A677-BCB7FC547D1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQL_CRM", "SQL_CRM\SQL_CRM.csproj", "{24006E1F-6845-461C-A677-BCB7FC547D1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQL_CRM.UnitTests", "SQL_CRM.UnitTests\SQL_CRM.UnitTests.csproj", "{87DD180B-BEA0-46E6-AD7A-5477C384203E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{24006E1F-6845-461C-A677-BCB7FC547D1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24006E1F-6845-461C-A677-BCB7FC547D1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24006E1F-6845-461C-A677-BCB7FC547D1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87DD180B-BEA0-46E6-AD7A-5477C384203E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87DD180B-BEA0-46E6-AD7A-5477C384203E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87DD180B-BEA0-46E6-AD7A-5477C384203E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87DD180B-BEA0-46E6-AD7A-5477C384203E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
