@@ -17,7 +17,7 @@ namespace SQL_CRM
         {
             _dbManager =
                 new CustomerDbManager(
-                    "Server = (localdb)\\mssqllocaldb; Database = CRM - Kundregister; Trusted_Connection = true;");
+                    "Server = kaffedbserver.database.windows.net; Database = KundregisterAndreasOVictor; Trusted_Connection = false; Encrypt = true; UID = CustomerWriter; PWD = 1234test_!");
 
             mainWindow.Width = 80;
             mainWindow.Height = 20;
