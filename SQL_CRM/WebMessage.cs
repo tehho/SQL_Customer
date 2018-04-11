@@ -4,15 +4,19 @@ namespace SQL_CRM
 {
     public class WebMessage
     {
-        private string _sender;
-        private string _message;
+        private readonly string _sender;
+        private readonly string _message;
         public ConsoleColor? Color { get; private set; }
 
         public string From => _sender;
         public string Message => _message;
 
+        public WebMessage(string message)
+            : this(null, message, null)
+        {
+        }
         public WebMessage(string sender, string message)
-         : this(sender, message, null)
+            : this(sender, message, null)
         {
         }
 
@@ -25,7 +29,7 @@ namespace SQL_CRM
 
         public override string ToString()
         {
-            return $"{_sender}: {_message}";
+            return ! string.IsNullOrWhiteSpace(_sender) ? $"{_sender}: {_message}" : _message;
         }
     }
 }

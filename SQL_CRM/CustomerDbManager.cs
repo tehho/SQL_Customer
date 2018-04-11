@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 
 namespace SQL_CRM
 {
@@ -13,34 +14,65 @@ namespace SQL_CRM
 
         public void UpdateCustomer(Customer customer)
         {
-            var sqlQuery = $"UPDATE Customer " +
-                           $"SET FirstName = @FName, LastName = @LName";
+            var where = new List<string>();
+            Action<SqlCommand> setParameters = null;
 
-            if (customer.Email != null)
-                sqlQuery += ", Email = @Email";
-            if (customer.PhoneNumber != null)
-                sqlQuery += $", PhoneNr = @PhoneNr ";
-
-            sqlQuery += $"WHERE Customer.Id = {customer.CustomerId}";
-
-            Query(sqlQuery,
-                (command) =>
+            if (customer != null)
+            {
+                if (customer.FirstName != null)
                 {
-                    command.Parameters.Add(new SqlParameter("FName", customer.FirstName));
-                    command.Parameters.Add(new SqlParameter("LName", customer.LastName));
+                    where.Add("Customer.FirstName = @FName");
+                    setParameters += (command) => command.Parameters.Add(new SqlParameter("FName", customer.FirstName));
+                }
 
-                    if (customer.Email != null)
-                        command.Parameters.Add(new SqlParameter("Email", customer.Email));
-                    if (customer.PhoneNumber != null)
-                        command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
+                if (customer.LastName != null)
+                {
+                    where.Add("Customer.LastName = @LName");
+                    setParameters += (command) => command.Parameters.Add(new SqlParameter("LName", customer.LastName));
+                }
 
-                    command.ExecuteNonQuery();
-                });
+                if (customer.Email != null)
+                {
+                    where.Add("Customer.Email = @Email");
+                    setParameters += (command) => command.Parameters.Add(new SqlParameter("Email", customer.Email));
+                }
+
+                string sql = "";
+                if (where.Count != 0)
+                {
+                    sql += $"UPDATE Customer " +
+                              $"SET " + string.Join(", ", where);
+                    sql += $" WHERE Customer.Id = @CustomerId;";
+                }
+
+                if (customer.PhoneNumber != null)
+                {
+                    sql += $" INSERT INTO PhoneNr (PhoneNr, CustomerId) VALUES (@PhoneNr, @CustomerId);";
+                    setParameters += (command) => command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
+                }
+
+                if (sql != "")
+                {
+                    Query(sql,
+                        (command) =>
+                        {
+                            setParameters?.Invoke(command);
+
+                            command.Parameters.Add(new SqlParameter("CustomerId", customer.CustomerId));
+
+                            command.ExecuteNonQuery();
+                        });
+                }
+            }
+
+            
         }
 
         public void DeleteCustomer(Customer customer)
         {
-            Query("DELETE FROM Customer WHERE Id = @ID", (command) =>
+            string sql = "DELETE FROM PhoneNr WHERE CustomerId = @ID; DELETE FROM Customer WHERE Id = @ID";
+
+            Query(sql, (command) =>
                 {
                     command.Parameters.Add(new SqlParameter("ID", customer.CustomerId));
 
@@ -161,8 +193,17 @@ namespace SQL_CRM
                     };
                 }
             }
-
-            var sql = "SELECT [Customer].Id, [Customer].FirstName, [Customer].LastName, [Customer].Email, [PhoneNr].PhoneNr FROM Customer LEFT JOIN PhoneNr ON Customer.Id = PhoneNr.CustomerId";
+            var sql = "SELECT [Customer].Id, [Customer].FirstName, [Customer].LastName, [Customer].Email, " +
+                      "stuff(" +
+                      "     ( " +
+                      "         SELECT cast(', ' AS VARCHAR(max)) + [PhoneNr].PhoneNr " +
+                      "         FROM PhoneNr " +
+                      "         WHERE PhoneNr.CustomerId = Customer.Id " +
+                      "         FOR xml path('')" +
+                      "     )" +
+                      "     , 1, 1, ''" +
+                      ") AS Phone" +
+                      " FROM Customer";
             if (where.Count != 0)
             {
                 sql += " Where " + string.Join(" and ", where);

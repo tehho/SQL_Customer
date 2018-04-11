@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SQL_CRM
 {
@@ -36,6 +37,11 @@ namespace SQL_CRM
             {
                 Messages.Dequeue();
             }
+        }
+
+        public void AddSeparator()
+        {
+            Add(new WebMessage(""));
         }
 
         public void StartRender()
@@ -162,22 +168,28 @@ namespace SQL_CRM
         public string GetInputWithQuestion(Question question)
         {
             _question = question.question;
-
-            for (var i = 0; i < question.answers.Count; i++)
+            while (true)
             {
-                Add(new WebMessage("System", $"{i + 1}. {question.answers[i].answer}"));
+                try
+                {
+                    for (var i = 0; i < question.answers.Count; i++)
+                    {
+                        Add(new WebMessage( $"{i + 1}. {question.answers[i].answer}"));
+                    }
+
+                    _needToReRender = true;
+
+                    var input = GetInput();
+
+                    AddSeparator();
+
+                    return question.Check(input);
+                }
+                catch (Exception e)
+                {
+                    Program.ErrorMessage("No valid input");
+                }
             }
-
-            _needToReRender = true;
-
-            var input = GetInput();
-            if (question.Check(input))
-            {
-                return input;
-            }
-
-            throw new InvalidOperationException("Answer does not exist");
-
         }
 
         public string GetInput()

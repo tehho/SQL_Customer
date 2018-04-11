@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SQL_CRM
@@ -14,15 +15,17 @@ namespace SQL_CRM
             answers = possibleAnswers.Select(item => new Answer(item)).ToList();
         }
 
-        public bool Check(string input)
+        public string Check(string input)
         {
-            foreach (var answer in answers)
+            for (int i = 0; i < answers.Count; i++)
             {
-                if (answer.Check(input))
-                    return true;
+                if (input == (i + 1).ToString())
+                    return answers[i].answer;
+                if (answers[i].Check(input))
+                    return answers[i].answer;
             }
 
-            return false;
+            throw new InvalidOperationException("Answer does not exist");
         }
     }
 }
