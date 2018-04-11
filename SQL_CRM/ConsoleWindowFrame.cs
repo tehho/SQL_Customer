@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SQL_CRM
 {
@@ -158,6 +157,27 @@ namespace SQL_CRM
             _needToReRender = true;
 
             return GetInput();
+        }
+
+        public string GetInputWithQuestion(Question question)
+        {
+            _question = question.question;
+
+            for (var i = 0; i < question.answers.Count; i++)
+            {
+                Add(new WebMessage("System", $"{i + 1}. {question.answers[i].answer}"));
+            }
+
+            _needToReRender = true;
+
+            var input = GetInput();
+            if (question.Check(input))
+            {
+                return input;
+            }
+
+            throw new InvalidOperationException("Answer does not exist");
+
         }
 
         public string GetInput()
