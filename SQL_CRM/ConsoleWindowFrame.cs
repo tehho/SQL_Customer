@@ -39,6 +39,11 @@ namespace SQL_CRM
             }
         }
 
+        public void AddSeparator()
+        {
+            Add(new WebMessage(""));
+        }
+
         public void StartRender()
         {
             _renderThread = new ThreadWraper(Render);
@@ -169,12 +174,15 @@ namespace SQL_CRM
                 {
                     for (var i = 0; i < question.answers.Count; i++)
                     {
-                        Program.SystemMessage($"{i + 1}. {question.answers[i].answer}");
+                        Add(new WebMessage( $"{i + 1}. {question.answers[i].answer}"));
                     }
 
                     _needToReRender = true;
 
-                    string input = GetInput();
+                    var input = GetInput();
+
+                    AddSeparator();
+
                     return question.Check(input);
                 }
                 catch (Exception e)

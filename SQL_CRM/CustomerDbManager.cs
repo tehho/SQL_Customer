@@ -70,7 +70,9 @@ namespace SQL_CRM
 
         public void DeleteCustomer(Customer customer)
         {
-            Query("DELETE FROM Customer WHERE Id = @ID", (command) =>
+            string sql = "DELETE FROM PhoneNr WHERE CustomerId = @ID; DELETE FROM Customer WHERE Id = @ID";
+
+            Query(sql, (command) =>
                 {
                     command.Parameters.Add(new SqlParameter("ID", customer.CustomerId));
 

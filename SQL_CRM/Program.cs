@@ -39,32 +39,60 @@ namespace SQL_CRM
                     var input = mainWindow.GetInputWithQuestion(mainQuestion);
                     if (input == "Skapa en kund")
                     {
-                        var cust = CreateCustomer();
+                        SystemMessage("Skapa en kund!");
 
-                        _dbManager.CreateCustomer(cust);
+                        var customer = CreateCustomer();
+
+                        _dbManager.CreateCustomer(customer);
+
+                        SystemMessage($"Ny kund skapad {customer}");
                     }
                     else if (input == "Ändra en kund")
                     {
+                        SystemMessage("Ändra en kund");
+
                         var customer = FindCustomer();
                         
-                        customer = ChangeCustomer(customer);
+                        SystemMessage("Hittat kund:");
+                        PrintCustomer(customer);
 
-                        _dbManager.UpdateCustomer(customer);
+                        var newcustomer = ChangeCustomer(customer);
+
+                        _dbManager.UpdateCustomer(newcustomer);
+
+
+                        SystemMessage("Ändrat värden:");
+
+                        if (newcustomer.FirstName != null)
+                            SystemMessage($"Förnamn: {customer.FirstName} {newcustomer.FirstName}");
+                        if (newcustomer.LastName != null)
+                            SystemMessage($"Efternamn: {customer.LastName} {newcustomer.LastName}");
+                        if (newcustomer.Email != null)
+                            SystemMessage($"Epost: {customer.Email} {newcustomer.Email}");
+                        if (newcustomer.PhoneNumber != null)
+                            SystemMessage($"Telefonnummer: {customer.PhoneNumber} {newcustomer.PhoneNumber}");
                     }
                     else if (input == "Tabort en kund")
                     {
-                        DeleteCustomer();
+                        SystemMessage("Tabort en kund");
 
+                        Customer customer = FindCustomer();
+                        
+                        _dbManager.DeleteCustomer(customer);
+
+                        SystemMessage("Tog bort kund:");
+                        PrintCustomer(customer);
                     }
                     else if (input == "Visa alla kunder")
                     {
+                        SystemMessage("Hämtar alla kunder:");
+
                         var list = _dbManager.GetAllCustomer();
 
                         foreach (var customer in list)
                         {
-                            mainWindow.Add(new WebMessage("Customer", customer.ToString(), ConsoleColor.Green));
+                            PrintCustomer(customer);
                         }
-
                     }
                     else if (input == "Rensa skärmen")
                     {
@@ -78,6 +106,8 @@ namespace SQL_CRM
                     {
                         ErrorMessage("No valid input");
                     }
+
+                    mainWindow.AddSeparator();
                 }
                 catch (Exception e)
                 {
@@ -92,6 +122,8 @@ namespace SQL_CRM
 
         private static Customer ChangeCustomer(Customer customer)
         {
+            PrintCustomer(customer);
+
             var ret = FillCustomer("Vad vill du ändra, spara ändringarna med Ändra", "Ändra");
             ret.CustomerId = customer.CustomerId;
             return ret;
@@ -152,6 +184,7 @@ namespace SQL_CRM
         {
             Customer customer = FillCustomer("Vad vill du söka på, välj sök när du är klar", "Sök");
             
+
             var list = _dbManager.GetCustomersFromCustomer(customer);
 
             if (list.Count == 1)
@@ -166,7 +199,6 @@ namespace SQL_CRM
             {
                 try
                 {
-
 
                     var input = mainWindow.GetInputWithQuestion(new Question("Vilken kund vill du välja", list.Select(
                             (item) =>
@@ -187,28 +219,27 @@ namespace SQL_CRM
 
         private static void DeleteCustomer()
         {
-            Customer customer = FindCustomer();
-
-            if (customer == null)
-            {
-                ErrorMessage("Invalid customer");
-                return;
-            }
-
-            _dbManager.DeleteCustomer(customer);
+            
         }
 
         private static Customer CreateCustomer()
         {
-            SystemMessage("Skapa en kund!");
+
             var firstName = mainWindow.GetInputWithQuestion("Skriv in kundens förnamn:");
             var lastName = mainWindow.GetInputWithQuestion("Skriv in kundens efternamn:");
             var Email = mainWindow.GetInputWithQuestion("Skriv in kundens email, lämna tomt om saknas:");
             var PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in kundens telefonnummer, lämna tomt om saknas:");
 
-            return new Customer(firstName, lastName, Email, PhoneNumber);
+            var customer = new Customer(firstName, lastName, Email, PhoneNumber);
+
+            return customer;
         }
 
+        public static void PrintCustomer(Customer customer)
+        {
+            mainWindow.Add(new WebMessage("Customer", customer.ToString(), ConsoleColor.Green));
+        }
+            
         public static void SystemMessage(string message)
         {
             mainWindow.Add(new WebMessage("System", message));
