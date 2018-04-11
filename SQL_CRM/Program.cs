@@ -32,60 +32,68 @@ namespace SQL_CRM
 
                 var input = mainWindow.GetInputWithQuestion("Skriv in ett val:");
 
-                if (input == "1")
+                try
                 {
-                    var cust = CreateCustomer();
-
-                    _dbManager.CreateCustomer(cust);
-                }
-                else if (input == "2")
-                {
-
-                    input = mainWindow.GetInputWithQuestion("Vilken kund vill du ändra:");
-
-                    List<Customer> list = _dbManager.GetCustomerFromFirstName(input);
-
-                    if (list.Count == 0)
+                    if (input == "1")
                     {
-                        ErrorMessage("No customer with that name!");
+                        var cust = CreateCustomer();
+
+                        _dbManager.CreateCustomer(cust);
+                    }
+                    else if (input == "2")
+                    {
+                        var customer = FindCustomer();
+                        input = mainWindow.GetInputWithQuestion("Vilken kund vill du ändra:");
+
+                        List<Customer> list = _dbManager.GetCustomerFromFirstName(input);
+
+                        if (list.Count == 0)
+                        {
+                            ErrorMessage("No customer with that name!");
+                        }
+                        else
+                        {
+                            var cust = ChangeCustomer(list[0]);
+
+                            _dbManager.UpdateCustomer(cust);
+                        }
+
+
+                    }
+                    else if (input == "3")
+                    {
+                        DeleteCustomer();
+
+                    }
+                    else if (input == "4")
+                    {
+                        var list = _dbManager.GetAllCustomer();
+
+                        foreach (var customer in list)
+                        {
+                            mainWindow.Add(new WebMessage("Customer", customer.ToString(), ConsoleColor.Green));
+                        }
+
+                    }
+                    else if (input == "5")
+                    {
+                        mainWindow.Clear();
+                    }
+                    else if (input == "6"
+                             || input == "quit"
+                             || input == "exit")
+                    {
+                        running = false;
                     }
                     else
                     {
-                        var cust = ChangeCustomer(list[0]);
-
-                        _dbManager.UpdateCustomer(cust);
+                        ErrorMessage("No valid input");
                     }
-
-
                 }
-                else if (input == "3")
+                catch (Exception e)
                 {
-                    DeleteCustomer();
-
-                }
-                else if (input == "4")
-                {
-                    var list = _dbManager.GetAllCustomer();
-
-                    foreach (var customer in list)
-                    {
-                        mainWindow.Add(new WebMessage("Customer", customer.ToString(), ConsoleColor.Green));
-                    }
-
-                }
-                else if (input == "5")
-                {
-                    mainWindow.Clear();
-                }
-                else if (input == "6"
-                            || input == "quit"
-                            || input == "exit")
-                {
-                    running = false;
-                }
-                else
-                {
-                    ErrorMessage("No valid input");
+                    Console.WriteLine(e);
+                    throw;
                 }
             }
 
@@ -143,6 +151,62 @@ namespace SQL_CRM
             customer.PhoneNumber = mainWindow.GetInputWithQuestion("Vad är kundens telefonnumer:");
         }
 
+        private static Customer FindCustomer()
+        {
+            Customer customer = new Customer();
+
+            var input = "";
+            do
+            {
+                input = mainWindow.GetInputWithQuestion("Vad vill du söka på:");
+                if (input == "1")
+                {
+                    customer.FirstName = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
+                }
+                else if (input == "2")
+                {
+                    customer.LastName = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
+                }
+                else if (input == "3")
+                {
+                    customer.Email = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
+                }
+                else if (input == "4")
+                {
+                    customer.PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
+                }
+            } while (input != "sök");
+            
+            var list = _dbManager.GetCustomersFromCustomer(customer);
+
+            if (list.Count == 1)
+                return list[0];
+
+            if (list.Count == 0)
+            {
+                return null;
+            }
+
+            uint index = 0;
+            do
+            {
+                try
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        SystemMessage($"{i+1}. {list[i]}");
+                    }
+                    index = uint.Parse(mainWindow.GetInputWithQuestion("Vilken kund vill du välja"));
+                }
+                catch (FormatException e)
+                {
+                    index = uint.MaxValue;
+                    ErrorMessage("Not a valid input");
+                }
+            } while (index > list.Count);
+
+            return list[(int)index];
+        }
 
         private static void DeleteCustomer()
         {
@@ -214,3 +278,4 @@ namespace SQL_CRM
         }
     }
 }
+

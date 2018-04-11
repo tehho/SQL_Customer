@@ -40,7 +40,7 @@ namespace SQL_CRM
 
         public override string ToString()
         {
-            string ret = $"{CustomerId}: {FirstName} {LastName}";
+            string ret = $"{FirstName} {LastName}";
 
             if (!string.IsNullOrEmpty(Email))
                 ret += $", {Email}";

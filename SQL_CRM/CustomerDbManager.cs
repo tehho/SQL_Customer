@@ -14,24 +14,31 @@ namespace SQL_CRM
 
         public void UpdateCustomer(Customer customer)
         {
-            var sqlQuery = $"UPDATE Customer " +
+            var sql = $"UPDATE Customer " +
                            $"SET FirstName = @FName, LastName = @LName";
 
             if (customer.Email != null)
-                sqlQuery += ", Email = @Email";
+                sql += ", Email = @Email";
+
+            sql += $"WHERE Customer.Id = @CustomerId;";
+
+
             if (customer.PhoneNumber != null)
-                sqlQuery += $", PhoneNr = @PhoneNr ";
+            {
+                sql += $" INSERT INTO PhoneNr (PhoneNr, CustomerId) VALUES (@PhoneNr, @CustomerId);";
+            }
+                
 
-            sqlQuery += $"WHERE Customer.Id = {customer.CustomerId}";
-
-            Query(sqlQuery,
+            Query(sql,
                 (command) =>
                 {
+                    command.Parameters.Add(new SqlParameter("CustomerId", customer.CustomerId));
                     command.Parameters.Add(new SqlParameter("FName", customer.FirstName));
                     command.Parameters.Add(new SqlParameter("LName", customer.LastName));
 
                     if (customer.Email != null)
                         command.Parameters.Add(new SqlParameter("Email", customer.Email));
+
                     if (customer.PhoneNumber != null)
                         command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
 
