@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Data.Common;
-using System.Linq;
-using System.Net.Sockets;
 
 namespace SQL_CRM
 {
     internal class Program
     {
         static ConsoleWindowFrame mainWindow = new ConsoleWindowFrame();
-        
+
         private static CustomerDbManager _dbManager;
 
         private static void Main(string[] args)
         {
             _dbManager =
                 new CustomerDbManager(
-                    "Server = (localdb)\\mssqllocaldb; Database = CRM - Kundregister; Trusted_Connection = true;");
+                    System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"].ConnectionString);
 
             mainWindow.Width = 80;
             mainWindow.Height = 20;
@@ -57,7 +53,7 @@ namespace SQL_CRM
                     else
                     {
                         var cust = ChangeCustomer(list[0]);
-                        
+
                         _dbManager.UpdateCustomer(cust);
                     }
 
@@ -147,7 +143,7 @@ namespace SQL_CRM
         {
             customer.PhoneNumber = mainWindow.GetInputWithQuestion("Vad är kundens telefonnumer:");
         }
-        
+
 
         private static void DeleteCustomer()
         {
@@ -155,7 +151,7 @@ namespace SQL_CRM
             SystemMessage("2. Efternamn");
             SystemMessage("3. Epost");
             SystemMessage("4. Telefonnummer");
-            
+
 
             var input = mainWindow.GetInputWithQuestion("Vad vill du söka på:");
 
