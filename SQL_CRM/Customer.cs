@@ -29,8 +29,8 @@ namespace SQL_CRM
             FirstName = firstName;
             LastName = lastName;
 
-            Email = string.IsNullOrEmpty(email) ? null: email;
-            PhoneNumber = string.IsNullOrEmpty(phoneNumber) ? null: phoneNumber;
+            Email = string.IsNullOrWhiteSpace(email) ? null: email;
+            PhoneNumber = string.IsNullOrWhiteSpace(phoneNumber) ? null: phoneNumber;
         }
 
         public Customer(string firstName, string lastName, string email, string phoneNumber)

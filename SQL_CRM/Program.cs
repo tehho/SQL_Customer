@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SQL_CRM
 {
@@ -19,53 +20,43 @@ namespace SQL_CRM
 
             mainWindow.StartRender();
 
+            var mainQuestion = new Question(
+                "Skriv in ett val",
+                "Skapa en kund,Ny kund,Ny",
+                "Ändra en kund,Ändra",
+                "Tabort en kund,Tabort",
+                "Visa alla kunder,Visa",
+                "Rensa skärmen,Rensa,Cls",
+                "Avsluta,Quit,Exit"
+            );
+
             var running = true;
 
             while (running)
             {
-                SystemMessage("1. Skapa en ny kund");
-                SystemMessage("2. Ändra en kund");
-                SystemMessage("3. Tabort en kund");
-                SystemMessage("4. Visa alla kunder");
-                SystemMessage("5. Rensa skärmen");
-                SystemMessage("6. Avsluta");
-
-                var input = mainWindow.GetInputWithQuestion("Skriv in ett val:");
-
                 try
                 {
-                    if (input == "1")
+                    var input = mainWindow.GetInputWithQuestion(mainQuestion);
+                    if (input == "Skapa en kund")
                     {
                         var cust = CreateCustomer();
 
                         _dbManager.CreateCustomer(cust);
                     }
-                    else if (input == "2")
+                    else if (input == "Ändra en kund")
                     {
                         var customer = FindCustomer();
-                        input = mainWindow.GetInputWithQuestion("Vilken kund vill du ändra:");
+                        
+                        customer = ChangeCustomer(customer);
 
-                        List<Customer> list = _dbManager.GetCustomerFromFirstName(input);
-
-                        if (list.Count == 0)
-                        {
-                            ErrorMessage("No customer with that name!");
-                        }
-                        else
-                        {
-                            var cust = ChangeCustomer(list[0]);
-
-                            _dbManager.UpdateCustomer(cust);
-                        }
-
-
+                        _dbManager.UpdateCustomer(customer);
                     }
-                    else if (input == "3")
+                    else if (input == "Tabort en kund")
                     {
                         DeleteCustomer();
 
                     }
-                    else if (input == "4")
+                    else if (input == "Visa alla kunder")
                     {
                         var list = _dbManager.GetAllCustomer();
 
@@ -75,13 +66,11 @@ namespace SQL_CRM
                         }
 
                     }
-                    else if (input == "5")
+                    else if (input == "Rensa skärmen")
                     {
                         mainWindow.Clear();
                     }
-                    else if (input == "6"
-                             || input == "quit"
-                             || input == "exit")
+                    else if (input == "Avsluta")
                     {
                         running = false;
                     }
@@ -92,8 +81,7 @@ namespace SQL_CRM
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
-                    throw;
+                    ErrorMessage(e.Message);
                 }
             }
 
@@ -104,32 +92,9 @@ namespace SQL_CRM
 
         private static Customer ChangeCustomer(Customer customer)
         {
-            //new Question("Förnamn", "FirstName,Förnamn,Namn", "LastName,Efternamn,Surname");
-            SystemMessage("1. Förnamn");
-            SystemMessage("2. Efternamn");
-            SystemMessage("3. Epost");
-            SystemMessage("4. Telefonnummer");
-
-            var input = mainWindow.GetInputWithQuestion("Vad vill du ändra:");
-
-            if (input == "1")
-            {
-                ChangeCustomerFirstName(customer);
-            }
-            else if (input == "2")
-            {
-                ChangeCustomerLastName(customer);
-            }
-            else if (input == "3")
-            {
-                ChangeCustomerEmail(customer);
-            }
-            else if (input == "4")
-            {
-                ChangeCustomerPhoneNumber(customer);
-            }
-
-            return customer;
+            var ret = FillCustomer("Vad vill du ändra, spara ändringarna med Ändra", "Ändra");
+            ret.CustomerId = customer.CustomerId;
+            return ret;
         }
 
         private static void ChangeCustomerFirstName(Customer customer)
@@ -152,31 +117,40 @@ namespace SQL_CRM
             customer.PhoneNumber = mainWindow.GetInputWithQuestion("Vad är kundens telefonnumer:");
         }
 
-        private static Customer FindCustomer()
+        private static Customer FillCustomer(string question, string exit)
         {
             Customer customer = new Customer();
+
+            Question quest = new Question(question, "Förnamn", "Efternamn", "Email", "Telefonnummer", exit);
 
             var input = "";
             do
             {
-                input = mainWindow.GetInputWithQuestion("Vad vill du söka på:");
-                if (input == "1")
+                input = mainWindow.GetInputWithQuestion(quest);
+                if (input == "Förnamn")
                 {
                     customer.FirstName = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
                 }
-                else if (input == "2")
+                else if (input == "Efternamn")
                 {
                     customer.LastName = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
                 }
-                else if (input == "3")
+                else if (input == "Email")
                 {
                     customer.Email = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
                 }
-                else if (input == "4")
+                else if (input == "Telefonnummer")
                 {
                     customer.PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
                 }
-            } while (input != "sök");
+            } while (input != exit);
+
+            return customer;
+        }
+
+        private static Customer FindCustomer()
+        {
+            Customer customer = FillCustomer("Vad vill du söka på, välj sök när du är klar", "Sök");
             
             var list = _dbManager.GetCustomersFromCustomer(customer);
 
@@ -188,67 +162,36 @@ namespace SQL_CRM
                 return null;
             }
 
-            uint index = 0;
-            do
+            while (true)
             {
                 try
                 {
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        SystemMessage($"{i+1}. {list[i]}");
-                    }
-                    index = uint.Parse(mainWindow.GetInputWithQuestion("Vilken kund vill du välja"));
+                    var input = mainWindow.GetInputWithQuestion(new Question("Vilken kund vill du välja", list.Select(
+                            (item) =>
+                            {
+                                var ret = $"{item.FirstName} {item.FirstName},{item.FirstName},{item.LastName}";
+
+                                if (item.Email != null)
+                                    ret += $",{item.Email}";
+
+                                if (item.PhoneNumber != null)
+                                    ret += $",{item.PhoneNumber}";
+
+                                return ret;
+                            }).ToArray()));
+
+                    return list.Find((item) => item.ToString() == input);
                 }
                 catch (FormatException e)
                 {
-                    index = uint.MaxValue;
                     ErrorMessage("Not a valid input");
                 }
-            } while (index > list.Count);
-
-            return list[(int)index];
+            }
         }
 
         private static void DeleteCustomer()
         {
-            SystemMessage("1. Förnamn");
-            SystemMessage("2. Efternamn");
-            SystemMessage("3. Epost");
-            SystemMessage("4. Telefonnummer");
-
-
-            var input = mainWindow.GetInputWithQuestion("Vad vill du söka på:");
-
-            List<Customer> list = new List<Customer>();
-
-            if (input == "1")
-            {
-                var name = mainWindow.GetInputWithQuestion("Skriv in kundens förnamn:");
-                list = _dbManager.GetCustomerFromFirstName(name);
-            }
-            else if (input == "2")
-            {
-                var name = mainWindow.GetInputWithQuestion("Skriv in kundens efternamn:");
-                list = _dbManager.GetCustomerFromLastName(name);
-            }
-            else if (input == "3")
-            {
-                var epost = mainWindow.GetInputWithQuestion("Skriv in kundens epost:");
-
-                list = _dbManager.GetCustomerFromEmail(epost);
-            }
-            else if (input == "4")
-            {
-                var phone = mainWindow.GetInputWithQuestion("Skriv in kundens telefonnummer:");
-                list = _dbManager.GetCustomerFromPhoneNumber(phone);
-            }
-
-            if (list.Count > 0)
-                DeleteCustomer(list[0]);
-        }
-
-        private static void DeleteCustomer(Customer customer)
-        {
+            Customer customer = FindCustomer();
             if (customer == null)
             {
                 ErrorMessage("Invalid customer");
@@ -260,20 +203,21 @@ namespace SQL_CRM
 
         private static Customer CreateCustomer()
         {
-            var firstName = mainWindow.GetInputWithQuestion("Enter the customers first name:");
-            var lastName = mainWindow.GetInputWithQuestion("Enter the customers last name:");
-            var Email = mainWindow.GetInputWithQuestion("Enter the customers email, leave blank if no email:");
-            var PhoneNumber = mainWindow.GetInputWithQuestion("Enter the customers phonenumber:");
+            SystemMessage("Skapa en kund!");
+            var firstName = mainWindow.GetInputWithQuestion("Skriv in kundens förnamn:");
+            var lastName = mainWindow.GetInputWithQuestion("Skriv in kundens efternamn:");
+            var Email = mainWindow.GetInputWithQuestion("Skriv in kundens email, lämna tomt om saknas:");
+            var PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in kundens telefonnummer, lämna tomt om saknas:");
 
             return new Customer(firstName, lastName, Email, PhoneNumber);
         }
 
-        private static void SystemMessage(string message)
+        public static void SystemMessage(string message)
         {
             mainWindow.Add(new WebMessage("System", message));
         }
 
-        private static void ErrorMessage(string message)
+        public static void ErrorMessage(string message)
         {
             mainWindow.Add(new WebMessage("Error", message, ConsoleColor.Red));
         }
