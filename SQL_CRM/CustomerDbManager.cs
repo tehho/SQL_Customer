@@ -163,7 +163,7 @@ namespace SQL_CRM
                 }
             }
 
-            var sql = "SELECT [Customer.Id], [Customer.FirstName], [Customer.LastName], [Customer.Email], [PhoneNr.PhoneNr] FROM Customer LEFT JOIN PhoneNr ON Customer.Id = PhoneNr.CustomerId";
+            var sql = "SELECT [Customer].Id, [Customer].FirstName, [Customer].LastName, [Customer].Email, [PhoneNr].PhoneNr FROM Customer LEFT JOIN PhoneNr ON Customer.Id = PhoneNr.CustomerId";
             if (where.Count != 0)
             {
                 sql += " Where " + string.Join(" and ", where);
