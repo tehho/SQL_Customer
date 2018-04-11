@@ -23,9 +23,9 @@ namespace SQL_CRM
             var mainQuestion = new Question(
                 "Skriv in ett val",
                 "Skapa en kund,Ny kund,Ny",
+                "Visa alla kunder,Visa",
                 "Ändra en kund,Ändra",
                 "Tabort en kund,Tabort",
-                "Visa alla kunder,Visa",
                 "Rensa skärmen,Rensa,Cls",
                 "Avsluta,Quit,Exit"
             );
@@ -133,15 +133,15 @@ namespace SQL_CRM
                 }
                 else if (input == "Efternamn")
                 {
-                    customer.LastName = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
+                    customer.LastName = mainWindow.GetInputWithQuestion("Skriv in ett efternamn:");
                 }
                 else if (input == "Email")
                 {
-                    customer.Email = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
+                    customer.Email = mainWindow.GetInputWithQuestion("Skriv in en epost:");
                 }
                 else if (input == "Telefonnummer")
                 {
-                    customer.PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in ett namn:");
+                    customer.PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in ett telefonnummer:");
                 }
             } while (input != exit);
 
@@ -166,16 +166,12 @@ namespace SQL_CRM
             {
                 try
                 {
+
+
                     var input = mainWindow.GetInputWithQuestion(new Question("Vilken kund vill du välja", list.Select(
                             (item) =>
                             {
-                                var ret = $"{item.FirstName} {item.FirstName},{item.FirstName},{item.LastName}";
-
-                                if (item.Email != null)
-                                    ret += $",{item.Email}";
-
-                                if (item.PhoneNumber != null)
-                                    ret += $",{item.PhoneNumber}";
+                                var ret = $"{item}";
 
                                 return ret;
                             }).ToArray()));
@@ -192,6 +188,7 @@ namespace SQL_CRM
         private static void DeleteCustomer()
         {
             Customer customer = FindCustomer();
+
             if (customer == null)
             {
                 ErrorMessage("Invalid customer");
