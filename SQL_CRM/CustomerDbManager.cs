@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 
 namespace SQL_CRM
 {
-    internal class CustomerDbManager : DbManager, ICustomerDbManager
+    public class CustomerDbManager : DbManager, ICustomerDbManager
     {
         public CustomerDbManager(string conString) : base(conString)
         {

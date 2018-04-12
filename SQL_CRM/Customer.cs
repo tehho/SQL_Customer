@@ -1,12 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Runtime.ExceptionServices;
-
-namespace SQL_CRM
+﻿namespace SQL_CRM
 {
-    internal class Customer
+    public class Customer : ICustomer
     {
-        public  int? CustomerId { get; set; }
+        public int? CustomerId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
@@ -29,8 +25,8 @@ namespace SQL_CRM
             FirstName = firstName;
             LastName = lastName;
 
-            Email = string.IsNullOrWhiteSpace(email) ? null: email;
-            PhoneNumber = string.IsNullOrWhiteSpace(phoneNumber) ? null: phoneNumber;
+            Email = string.IsNullOrWhiteSpace(email) ? null : email;
+            PhoneNumber = string.IsNullOrWhiteSpace(phoneNumber) ? null : phoneNumber;
         }
 
         public Customer(string firstName, string lastName, string email, string phoneNumber)

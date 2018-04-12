@@ -3,7 +3,7 @@ using System.Data.SqlClient;
 
 namespace SQL_CRM
 {
-    internal class DbManager
+    public class DbManager
     {
         private string ConString { get; set; }
 

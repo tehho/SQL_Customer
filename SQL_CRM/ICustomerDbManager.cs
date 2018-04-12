@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 
 namespace SQL_CRM
 {
-    internal interface ICustomerDbManager
+    public interface ICustomerDbManager
     {
         void UpdateCustomer(Customer customer);
         void DeleteCustomer(Customer customer);
