@@ -10,75 +10,7 @@ namespace SQL_CRM
         {
 
         }
-
-        public void UpdateCustomer(ICustomer customer)
-        {
-            var where = new List<string>();
-            Action<SqlCommand> setParameters = null;
-
-            if (customer != null)
-            {
-                if (customer.FirstName != null)
-                {
-                    where.Add("Customer.FirstName = @FName");
-                    setParameters += (command) => command.Parameters.Add(new SqlParameter("FName", customer.FirstName));
-                }
-
-                if (customer.LastName != null)
-                {
-                    where.Add("Customer.LastName = @LName");
-                    setParameters += (command) => command.Parameters.Add(new SqlParameter("LName", customer.LastName));
-                }
-
-                if (customer.Email != null)
-                {
-                    where.Add("Customer.Email = @Email");
-                    setParameters += (command) => command.Parameters.Add(new SqlParameter("Email", customer.Email));
-                }
-
-                string sql = "";
-                if (where.Count != 0)
-                {
-                    sql += $"UPDATE Customer " +
-                              $"SET " + string.Join(", ", where);
-                    sql += $" WHERE Customer.Id = @CustomerId;";
-                }
-
-                if (customer.PhoneNumber != null)
-                {
-                    sql += $" INSERT INTO PhoneNr (PhoneNr, CustomerId) VALUES (@PhoneNr, @CustomerId);";
-                    setParameters += (command) => command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
-                }
-
-                if (sql != "")
-                {
-                    Query(sql,
-                        (command) =>
-                        {
-                            setParameters?.Invoke(command);
-
-                            command.Parameters.Add(new SqlParameter("CustomerId", customer.CustomerId));
-
-                            command.ExecuteNonQuery();
-                        });
-                }
-            }
-
-
-        }
-
-        public void DeleteCustomer(ICustomer customer)
-        {
-            string sql = "DELETE FROM PhoneNr WHERE CustomerId = @ID; DELETE FROM Customer WHERE Id = @ID";
-
-            Query(sql, (command) =>
-                {
-                    command.Parameters.Add(new SqlParameter("ID", customer.CustomerId));
-
-                    command.ExecuteNonQuery();
-                });
-        }
-
+        
         public void CreateCustomer(ICustomer customer)
         {
             var sql = $"DECLARE @CustomerId int " +
@@ -114,39 +46,7 @@ namespace SQL_CRM
                     command.ExecuteNonQuery();
                 });
         }
-
-        public List<ICustomer> GetCustomerFromFirstName(string firstName)
-        {
-            return GetCustomersFromCustomer(new Customer()
-            {
-                FirstName = firstName
-            });
-        }
-
-        public List<ICustomer> GetCustomerFromLastName(string lastName)
-        {
-            return GetCustomersFromCustomer(new Customer()
-            {
-                LastName = lastName
-            });
-        }
-
-        public List<ICustomer> GetCustomerFromEmail(string email)
-        {
-            return GetCustomersFromCustomer(new Customer()
-            {
-                Email = email
-            });
-        }
-
-        public List<ICustomer> GetCustomerFromPhoneNumber(string phoneNumber)
-        {
-            return GetCustomersFromCustomer(new Customer()
-            {
-                PhoneNumber = phoneNumber
-            });
-        }
-
+        
         public List<ICustomer> GetCustomersFromCustomer(ICustomer customer)
         {
             var list = new List<ICustomer>();
@@ -224,33 +124,113 @@ namespace SQL_CRM
 
             return list;
         }
-
+        
         public List<ICustomer> GetAllCustomer()
         {
             return GetCustomersFromCustomer(null);
         }
 
-        private List<ICustomer> GetCustomers(string sql, Action<SqlCommand> setParameter, Func<SqlDataReader, Customer> readerMethod)
+        public void UpdateCustomer(ICustomer customer)
         {
-            List<ICustomer> list = new List<ICustomer>();
+            var where = new List<string>();
+            Action<SqlCommand> setParameters = null;
 
-            Query(sql, (command) =>
+            if (customer != null)
             {
-                setParameter?.Invoke(command);
-
-                var reader = command.ExecuteReader();
-
-                while (reader.Read())
+                if (customer.FirstName != null)
                 {
-                    list.Add(readerMethod(reader));
+                    where.Add("Customer.FirstName = @FName");
+                    setParameters += (command) => command.Parameters.Add(new SqlParameter("FName", customer.FirstName));
                 }
 
-            });
+                if (customer.LastName != null)
+                {
+                    where.Add("Customer.LastName = @LName");
+                    setParameters += (command) => command.Parameters.Add(new SqlParameter("LName", customer.LastName));
+                }
 
-            return list;
+                if (customer.Email != null)
+                {
+                    where.Add("Customer.Email = @Email");
+                    setParameters += (command) => command.Parameters.Add(new SqlParameter("Email", customer.Email));
+                }
+
+                string sql = "";
+                if (where.Count != 0)
+                {
+                    sql += $"UPDATE Customer " +
+                              $"SET " + string.Join(", ", where);
+                    sql += $" WHERE Customer.Id = @CustomerId;";
+                }
+
+                if (customer.PhoneNumber != null)
+                {
+                    sql += $" INSERT INTO PhoneNr (PhoneNr, CustomerId) VALUES (@PhoneNr, @CustomerId);";
+                    setParameters += (command) => command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
+                }
+
+                if (sql != "")
+                {
+                    Query(sql,
+                        (command) =>
+                        {
+                            setParameters?.Invoke(command);
+
+                            command.Parameters.Add(new SqlParameter("CustomerId", customer.CustomerId));
+
+                            command.ExecuteNonQuery();
+                        });
+                }
+            }
+
+
         }
 
-        private ICustomer CreateCustomerFromSqlReader(SqlDataReader reader)
+        public void DeleteCustomer(ICustomer customer)
+        {
+            string sql = "DELETE FROM PhoneNr WHERE CustomerId = @ID; DELETE FROM Customer WHERE Id = @ID";
+
+            Query(sql, (command) =>
+                {
+                    command.Parameters.Add(new SqlParameter("ID", customer.CustomerId));
+
+                    command.ExecuteNonQuery();
+                });
+        }
+
+        public List<ICustomer> GetCustomerFromFirstName(string firstName)
+        {
+            return GetCustomersFromCustomer(new Customer()
+            {
+                FirstName = firstName
+            });
+        }
+
+        public List<ICustomer> GetCustomerFromLastName(string lastName)
+        {
+            return GetCustomersFromCustomer(new Customer()
+            {
+                LastName = lastName
+            });
+        }
+
+        public List<ICustomer> GetCustomerFromEmail(string email)
+        {
+            return GetCustomersFromCustomer(new Customer()
+            {
+                Email = email
+            });
+        }
+
+        public List<ICustomer> GetCustomerFromPhoneNumber(string phoneNumber)
+        {
+            return GetCustomersFromCustomer(new Customer()
+            {
+                PhoneNumber = phoneNumber
+            });
+        }
+
+        private static ICustomer CreateCustomerFromSqlReader(SqlDataReader reader)
         {
             string email = null;
             string phoneNumber = null;
@@ -276,6 +256,5 @@ namespace SQL_CRM
 
             return new Customer(id, firstName, lastName, email, phoneNumber);
         }
-
     }
 }

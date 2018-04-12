@@ -120,6 +120,19 @@ namespace SQL_CRM
             mainWindow.Abort();
         }
 
+        private static ICustomer CreateCustomer()
+        {
+
+            var firstName = mainWindow.GetInputWithQuestion("Skriv in kundens förnamn:");
+            var lastName = mainWindow.GetInputWithQuestion("Skriv in kundens efternamn:");
+            var Email = mainWindow.GetInputWithQuestion("Skriv in kundens email, lämna tomt om saknas:");
+            var PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in kundens telefonnummer, lämna tomt om saknas:");
+
+            var customer = new Customer(firstName, lastName, Email, PhoneNumber);
+
+            return customer;
+        }
+
         private static ICustomer ChangeCustomer(ICustomer customer)
         {
             PrintCustomer(customer);
@@ -127,26 +140,6 @@ namespace SQL_CRM
             var ret = FillCustomer("Vad vill du ändra, spara ändringarna med Ändra", "Ändra");
             ret.CustomerId = customer.CustomerId;
             return ret;
-        }
-
-        private static void ChangeCustomerFirstName(ICustomer customer)
-        {
-            customer.FirstName = mainWindow.GetInputWithQuestion("Vad är kundens förnamn:");
-        }
-
-        private static void ChangeCustomerLastName(ICustomer customer)
-        {
-            customer.LastName = mainWindow.GetInputWithQuestion("Vad är kundens efternamn:");
-        }
-
-        private static void ChangeCustomerEmail(ICustomer customer)
-        {
-            customer.Email = mainWindow.GetInputWithQuestion("Vad är kundens epost:");
-        }
-
-        private static void ChangeCustomerPhoneNumber(ICustomer customer)
-        {
-            customer.PhoneNumber = mainWindow.GetInputWithQuestion("Vad är kundens telefonnumer:");
         }
 
         private static ICustomer FillCustomer(string question, string exit)
@@ -202,7 +195,7 @@ namespace SQL_CRM
                     var temp_List = list.Select(
                         (item) =>
                         {
-                            var ret = $"{item.ToString()}";
+                            var ret = $"'{item.ToString()}'";
 
                             return ret;
                         }).ToList();
@@ -221,19 +214,6 @@ namespace SQL_CRM
         private static void DeleteCustomer()
         {
 
-        }
-
-        private static Customer CreateCustomer()
-        {
-
-            var firstName = mainWindow.GetInputWithQuestion("Skriv in kundens förnamn:");
-            var lastName = mainWindow.GetInputWithQuestion("Skriv in kundens efternamn:");
-            var Email = mainWindow.GetInputWithQuestion("Skriv in kundens email, lämna tomt om saknas:");
-            var PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in kundens telefonnummer, lämna tomt om saknas:");
-
-            var customer = new Customer(firstName, lastName, Email, PhoneNumber);
-
-            return customer;
         }
 
         public static void PrintCustomer(ICustomer customer)

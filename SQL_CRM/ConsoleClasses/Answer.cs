@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace SQL_CRM
 {
@@ -11,7 +12,9 @@ namespace SQL_CRM
 
         public Answer(string possibleAnswers)
         {
-            this.possibleAnswers = possibleAnswers.Split(',').Where(item => !string.IsNullOrEmpty(item.Trim())).ToList();
+            var list = Regex.Split(possibleAnswers, "('[^']+')|([^,']+),");
+            
+            this.possibleAnswers = list.Where(item => !string.IsNullOrEmpty(item.Trim())).Select(item => item.Trim().Trim("'".ToCharArray())).ToList();
         }
 
         public bool Check(string input)

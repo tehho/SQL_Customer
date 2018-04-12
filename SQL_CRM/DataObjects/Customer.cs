@@ -2,12 +2,43 @@
 {
     public class Customer : ICustomer
     {
-        public int? CustomerId { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
+        private int? _customerId;
+        private string _firstName;
+        private string _lastName;
+        private string _email;
+        private string _phoneNr;
 
-        public string PhoneNumber { get; set; }
+        public int? CustomerId
+        {
+            get { return _customerId; }
+            set { _customerId = value; }
+        }
+
+        public string FirstName
+        {
+            get { return _firstName; }
+            set
+            {
+                _firstName = value?.Trim();
+            }
+        }
+
+        public string LastName
+        {
+            get => _lastName;
+            set => _lastName = value?.Trim();
+        }
+        public string Email
+        {
+            get => _email;
+            set => _email = value?.Trim();
+        }
+
+        public string PhoneNumber
+        {
+            get => _phoneNr;
+            set => _phoneNr = value?.Trim();
+        }
 
         public Customer()
             : this(null, null, null, null, null)
