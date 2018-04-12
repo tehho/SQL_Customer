@@ -1,11 +1,12 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace SQL_CRM.UnitTests
 {
     [TestClass]
     public class QuestionTests
     {
-        Question question = new Question("Test", "Tester", "Testsson", "Another Test");
+        Question question = new Question("Test", "Tester,Test", "Testsson", "Another Test");
 
         [TestMethod]
         public void TestConstructor_ShouldSucceed()
@@ -21,17 +22,17 @@ namespace SQL_CRM.UnitTests
         [TestMethod]
         public void TestCheck_InputIsInAnswers_ReturnTrue()
         {
-            Assert.AreEqual(true, question.Check("Tester"));
-            Assert.AreEqual(true, question.Check("Testsson"));
-            Assert.AreEqual(true, question.Check("Another Test"));
+            Assert.AreEqual("Tester", question.Check("Test"));
+            Assert.AreEqual("Testsson", question.Check("Testsson"));
+            Assert.AreEqual("Another Test", question.Check("Another Test"));
         }
 
         [TestMethod]
         public void TestCheck_InputIsNotInAnswers_ReturnFalse()
         {
-            Assert.AreEqual(false, question.Check("Hello"));
-            Assert.AreEqual(false, question.Check("Should Fail"));
-            Assert.AreEqual(false, question.Check(""));
+            Assert.ThrowsException<InvalidOperationException>(() => question.Check("Hello"));
+            Assert.ThrowsException<InvalidOperationException>(() => question.Check(" "));
+            Assert.ThrowsException<InvalidOperationException>(() => question.Check(","));
         }
     }
 }
