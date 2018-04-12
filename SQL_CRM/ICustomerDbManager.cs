@@ -9,7 +9,7 @@ namespace SQL_CRM
         void UpdateCustomer(Customer customer);
         void DeleteCustomer(Customer customer);
         void CreateCustomer(Customer customer);
-        List<Customer> GetCustomerFromFirstName(string firstName);
+        List<ICustomer> GetCustomerFromFirstName(string firstName);
         List<Customer> GetCustomerFromLastName(string lastName);
         List<Customer> GetCustomerFromEmail(string email);
         List<Customer> GetCustomerFromPhoneNumber(string phoneNumber);

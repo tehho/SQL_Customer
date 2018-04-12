@@ -115,7 +115,7 @@ namespace SQL_CRM
                 });
         }
 
-        public List<Customer> GetCustomerFromFirstName(string firstName)
+        public List<ICustomer> GetCustomerFromFirstName(string firstName)
         {
             return GetCustomersFromCustomer(new Customer()
             {
