@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 
 namespace SQL_CRM
 {
-    public class ProductDbManager : DbManager, ICrud<IProduct>, IProductDbManager
+    public class ProductDbManager : DbManager, IProductDbManager
     {
         public ProductDbManager(string conString) : base(conString)
         {
@@ -12,7 +12,17 @@ namespace SQL_CRM
 
         public void Create(IProduct product)
         {
-            throw new NotImplementedException();
+            var sql = $"INSERT INTO Product (Name";
+
+            sql += $") VALUES (@Name)";
+
+            Query(sql,
+                (command) =>
+                {
+                    command.Parameters.Add(new SqlParameter("@Name", product.Name));
+
+                    command.ExecuteNonQuery();
+                });
         }
 
         public List<IProduct> Read(IProduct product)
@@ -29,7 +39,7 @@ namespace SQL_CRM
             {
                 if (product.Name != null)
                 {
-                    where.Add("Customer.Name = @Name");
+                    where.Add("Product.Name = @Name");
                     setParameters += (command) =>
                     {
                         command.Parameters.Add(new SqlParameter("Name", product.Name));
@@ -53,12 +63,50 @@ namespace SQL_CRM
 
         public void Update(IProduct product)
         {
-            throw new NotImplementedException();
+            var update = new List<string>();
+            Action<SqlCommand> setParameters = null;
+
+            if (product != null)
+            {
+                if (product.Name != null)
+                {
+                    update.Add("Product.Name = @Name");
+                    setParameters += (command) => command.Parameters.Add(new SqlParameter("Name", product.Name));
+                }
+
+                string sql = "";
+                if (update.Count != 0)
+                {
+                    sql += $"UPDATE Product " +
+                              $"SET " + string.Join(", ", update);
+                    sql += $" WHERE Product.Id = @ProductId;";
+                }
+
+                if (sql != "")
+                {
+                    Query(sql,
+                        (command) =>
+                        {
+                            setParameters?.Invoke(command);
+
+                            command.Parameters.Add(new SqlParameter("ProductId", product.Id));
+
+                            command.ExecuteNonQuery();
+                        });
+                }
+            }
         }
 
         public void Delete(IProduct product)
         {
-            throw new NotImplementedException();
+            string sql = "DELETE FROM Product WHERE Id = @ID";
+
+            Query(sql, (command) =>
+            {
+                command.Parameters.Add(new SqlParameter("ID", product.Id));
+
+                command.ExecuteNonQuery();
+            });
         }
 
 

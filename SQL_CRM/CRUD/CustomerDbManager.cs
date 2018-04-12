@@ -44,7 +44,7 @@ namespace SQL_CRM
 
                     if (customer.Email != null)
                         command.Parameters.Add(new SqlParameter("Email", customer.Email));
-                    
+
                     if (customer.PhoneNumbers != null)
                     {
                         for (int i = 0; i < customer.PhoneNumbers.Count; i++)
@@ -67,7 +67,7 @@ namespace SQL_CRM
             var sql =
                 "SELECT [Customer].Id, [Customer].FirstName, [Customer].LastName, [Customer].Email, [PhoneNr].PhoneNr " +
                 "FROM Customer ";
-            
+
             if (customer != null)
             {
                 if (customer.FirstName != null)
@@ -198,7 +198,7 @@ namespace SQL_CRM
                     command.ExecuteNonQuery();
                 });
         }
-        
+
         public List<ICustomer> GetCustomerFromFirstName(string firstName)
         {
             return Read(new Customer()
@@ -230,7 +230,7 @@ namespace SQL_CRM
                 PhoneNumber = phoneNumber
             });
         }
-        
+
         public List<ICustomer> GetAllCustomer()
         {
             return Read(null);

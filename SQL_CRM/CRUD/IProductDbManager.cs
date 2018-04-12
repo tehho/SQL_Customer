@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 
 namespace SQL_CRM
 {
-    public interface IProductDbManager
+    public interface IProductDbManager : ICrud<IProduct>
     {
         void Create(IProduct product);
         List<IProduct> Read(IProduct product);
