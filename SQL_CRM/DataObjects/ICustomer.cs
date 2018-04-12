@@ -7,6 +7,7 @@ namespace SQL_CRM
         int? CustomerId { get; set; }
         string FirstName { get; set; }
         string LastName { get; set; }
+        string FullName { get;}
         string Email { get; set; }
         List<string> PhoneNumbers { get; set; }
 

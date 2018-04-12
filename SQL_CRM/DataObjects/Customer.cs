@@ -26,6 +26,9 @@ namespace SQL_CRM
             set => _lastName = value?.Trim();
         }
 
+        public string FullName => $"{FirstName} {LastName}";
+
+
         public string Email
         {
             get => _email;

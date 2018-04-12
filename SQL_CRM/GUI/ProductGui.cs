@@ -6,8 +6,8 @@ namespace SQL_CRM
     public class ProductGui : AdministrateGui<IProduct>
     {
 
-        public ProductGui(ConsoleWindowFrame mainWindow) 
-            : base(mainWindow, 
+        public ProductGui(ConsoleWindowFrame mainWindow)
+            : base(mainWindow,
                 new ProductDbManager(System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"].ConnectionString))
         {
         }
@@ -140,6 +140,35 @@ namespace SQL_CRM
                 catch (FormatException e)
                 {
                     _mainWindow.ErrorMessage("Not a valid input");
+                }
+            }
+        }
+        
+        public void ReadAllCustomersThatLikesProduct()
+        {
+            _mainWindow.SystemMessage("Hämta en produkt");
+
+            var product = Find();
+
+            _mainWindow.SystemMessage($"Hämtar kunder som gillar {product.Name}...");
+
+            var customers = ((ProductDbManager)_dbManager).GetAllCustomer(product);
+
+            _mainWindow.SystemMessage($"Produktkunderna gillar:");
+
+            Program.Print(product);
+
+            _mainWindow.AddSeparator();
+
+            if (customers.Count == 0)
+            {
+                _mainWindow.SystemMessage("Inga kunder hittades");
+            }
+            else
+            {
+                foreach (var customer in customers)
+                {
+                    Program.Print(customer);
                 }
             }
         }

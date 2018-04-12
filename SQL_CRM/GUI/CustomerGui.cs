@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace SQL_CRM
 {
     public class CustomerGui : AdministrateGui<ICustomer>
     {
 
-        public CustomerGui(ConsoleWindowFrame mainWindow) 
-            : base(mainWindow, 
+        public CustomerGui(ConsoleWindowFrame mainWindow)
+            : base(mainWindow,
                 new CustomerDbManager(System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"].ConnectionString))
         {
         }
@@ -22,6 +23,7 @@ namespace SQL_CRM
                 "Lägg till ett telefonnummer på befintlig kund, Lägg till, Telefon",
                 "Tabort en kund,Tabort",
                 "Tabort ett telefonnummer på en kund,Tabort telefon",
+                "Visa alla produkter en kund är intresserad av",
                 "Tillbaka"
             );
 
@@ -50,6 +52,39 @@ namespace SQL_CRM
             else if (input == "Tabort ett telefonnummer på en kund")
             {
                 DeletePhoneNr();
+            }
+            else if (input == "Visa alla produkter en kund är intresserad av")
+            {
+                ReadAllProductsCustomerLikes();
+            }
+        }
+
+        private void ReadAllProductsCustomerLikes()
+        {
+            _mainWindow.SystemMessage("Hämta en kund");
+
+            var customer = Find();
+
+            _mainWindow.SystemMessage($"Hämtar produkter kund {customer.FullName} gillar...");
+
+            var products = ((CustomerDbManager)_dbManager).GetAllProducts(customer);
+
+            _mainWindow.SystemMessage($"Kund {customer} gillar:");
+
+            Program.Print(customer);
+
+            _mainWindow.AddSeparator();
+
+            if (products.Count == 0)
+            {
+                _mainWindow.SystemMessage("Inga produkter hittades");
+            }
+            else
+            {
+                foreach (var product in products)
+                {
+                    Program.Print(product);
+                }
             }
         }
 
@@ -125,6 +160,36 @@ namespace SQL_CRM
             Program.Print(customer);
         }
 
+        private void AddPhoneNr()
+        {
+            _mainWindow.SystemMessage("Lägg till telefonnummer på befintligt kund");
+
+            var customer = new Customer()
+            {
+                CustomerId = Find().CustomerId,
+                PhoneNumber = _mainWindow.GetInputWithQuestion("Skriv in ett telefonnummer:")
+            };
+
+            _dbManager.Update(customer);
+        }
+
+        private void DeletePhoneNr()
+        {
+            _mainWindow.SystemMessage("Tabort ett telefonnummer på en kund");
+
+            var customer = Find();
+
+            if (customer.PhoneNumbers.Count == 1)
+            {
+                customer = new Customer()
+                {
+                    CustomerId = customer.CustomerId,
+                    PhoneNumber = customer.PhoneNumber
+                };
+                ((CustomerDbManager)_dbManager).DeletePhoneNr(customer);
+            }
+        }
+
         public override ICustomer Find()
         {
             var customer = Fill("Vad vill du söka på, välj sök när du är klar", "Sök");
@@ -159,35 +224,6 @@ namespace SQL_CRM
                 {
                     _mainWindow.ErrorMessage("Not a valid input");
                 }
-            }
-        }
-        
-        private void AddPhoneNr()
-        {
-            _mainWindow.SystemMessage("Lägg till telefonnummer på befintligt kund");
-
-            var customer = new Customer()
-            {
-                CustomerId = Find().CustomerId,
-                PhoneNumber = _mainWindow.GetInputWithQuestion("Skriv in ett telefonnummer:")
-            };
-
-            _dbManager.Update(customer);
-        }
-        private void DeletePhoneNr()
-        {
-            _mainWindow.SystemMessage("Tabort ett telefonnummer på en kund");
-
-            var customer = Find();
-
-            if (customer.PhoneNumbers.Count == 1)
-            {
-                customer = new Customer()
-                {
-                    CustomerId = customer.CustomerId,
-                    PhoneNumber = customer.PhoneNumber
-                };
-                ((CustomerDbManager)_dbManager).DeletePhoneNr(customer);
             }
         }
         private ICustomer Fill(string question, string exit)

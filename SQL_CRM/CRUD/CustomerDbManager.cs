@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace SQL_CRM
 {
@@ -121,7 +122,11 @@ namespace SQL_CRM
                         }
                         else
                         {
-                            list.Add(customer.CustomerId.Value, customer);
+                            if (customer.CustomerId != null)
+                            {
+                                list.Add(customer.CustomerId.Value, customer);
+                            }
+
                         }
                     }
                 });
@@ -256,7 +261,7 @@ namespace SQL_CRM
 
             if (customer?.CustomerId != null)
             {
-                var sql = $"SELECT [Product].[Name], [Product].[Id] " +
+                var sql = $"SELECT [Product].[Id], [Product].[Name] " +
                           $"FROM CustomerLikesProduct " +
                           $"LEFT JOIN Product ON CustomerLikesProduct.ProductId = Product.Id " +
                           $"WHERE CustomerLikesProduct.CustomerId = @CustomerId";
@@ -289,20 +294,15 @@ namespace SQL_CRM
             var firstName = reader.GetString(1);
             var lastName = reader.GetString(2);
 
-            try
-            {
-                email = reader.GetString(3);
-            }
-            catch (Exception e)
-            {
 
-            }
+            if (!reader.IsDBNull(3))
+                email = reader.GetString(3);
 
             try
             {
                 phoneNumber = reader.GetString(4);
             }
-            catch (Exception e)
+            catch (InvalidCastException e)
             {
 
             }
