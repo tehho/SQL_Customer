@@ -155,6 +155,13 @@ namespace SQL_CRM
             var where = new List<string>();
             Action<SqlCommand> setParameters = null;
 
+            var sql = "SELECT [Customer].Id, [Customer].FirstName, [Customer].LastName, [Customer].Email, " +
+                        "stuff(" +
+                        "( " +
+                            "SELECT cast(', ' AS VARCHAR(max)) + [PhoneNr].PhoneNr " +
+                            "FROM PhoneNr " +
+                            "WHERE PhoneNr.CustomerId = Customer.Id ";
+
             if (customer != null)
             {
                 if (customer.FirstName != null)
@@ -186,27 +193,22 @@ namespace SQL_CRM
 
                 if (customer.PhoneNumber != null)
                 {
-                    where.Add("PhoneNr.PhoneNr = @PhoneNr");
+                    sql += " AND PhoneNr LIKE @PhoneNr ";
                     setParameters += (command) =>
                     {
-                        command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
+                        command.Parameters.Add(new SqlParameter("PhoneNr", $"%{customer.PhoneNumber}%"));
                     };
                 }
             }
-            var sql = "SELECT [Customer].Id, [Customer].FirstName, [Customer].LastName, [Customer].Email, " +
-                      "stuff(" +
-                      "     ( " +
-                      "         SELECT cast(', ' AS VARCHAR(max)) + [PhoneNr].PhoneNr " +
-                      "         FROM PhoneNr " +
-                      "         WHERE PhoneNr.CustomerId = Customer.Id " +
-                      "         FOR xml path('')" +
-                      "     )" +
-                      "     , 1, 1, ''" +
-                      ") AS Phone" +
-                      " FROM Customer";
+
+            sql += "FOR xml path('')" +
+                   ")" +
+                   ", 1, 1, ''" +
+                   ") AS Phone " +
+                   "FROM Customer";
             if (where.Count != 0)
             {
-                sql += " Where " + string.Join(" and ", where);
+                sql += " Where " + string.Join(" AND ", where);
             }
 
 
