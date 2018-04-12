@@ -10,6 +10,7 @@ namespace SQL_CRM
         string FullName { get;}
         string Email { get; set; }
         List<string> PhoneNumbers { get; set; }
+        List<Product> LikedProducts { get; set; }
 
         string PhoneNumber
         {

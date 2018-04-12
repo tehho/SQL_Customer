@@ -1,6 +1,4 @@
-﻿using FakeItEasy;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SQL_CRM.UnitTests
 {
@@ -37,19 +35,19 @@ namespace SQL_CRM.UnitTests
 
         //}
 
-        [TestMethod]
-        public void TestUpdate()
-        {
-            var prod = new Product { Id = 1, Name = "Updated" };
+        //[TestMethod]
+        //public void TestUpdate()
+        //{
+        //    var prod = new Product { Id = 1, Name = "Updated" };
 
-            _manager.Update(prod);
-            var list = _manager.Read(new Product());
-            var single = list.Where(x => x.Id == 1).ToList().Single();
+        //    _manager.Update(prod);
+        //    var list = _manager.Read(new Product());
+        //    var single = list.Where(x => x.Id == 1).ToList().Single();
 
-            Assert.AreEqual("Updated", single.Name);
+        //    Assert.AreEqual("Updated", single.Name);
 
-            var reset = new Product { Id = 1, Name = "Resetted" };
-            _manager.Update(reset);
-        }
+        //    var reset = new Product { Id = 1, Name = "Resetted" };
+        //    _manager.Update(reset);
+        //}
     }
 }

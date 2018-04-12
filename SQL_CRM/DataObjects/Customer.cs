@@ -8,6 +8,7 @@ namespace SQL_CRM
         private string _lastName;
         private string _email;
         private List<string> _phoneNr;
+        private List<Product> _likedProducts;
 
         public int? CustomerId { get; set; }
 
@@ -41,6 +42,12 @@ namespace SQL_CRM
             set => _phoneNr = value == null ? null : new List<string>(value);
         }
 
+        public List<Product> LikedProducts
+        {
+            get => _likedProducts;
+            set => _likedProducts = value == null ? null : new List<Product>(value);
+        }
+
         public string PhoneNumber
         {
             get => _phoneNr?.Count == 0 ? null : _phoneNr?[0];
@@ -64,6 +71,10 @@ namespace SQL_CRM
         }
 
         public string AddPhoneNumber { set => _phoneNr.Add(value.Trim()); }
+        public string AddProduct
+        {
+            set => _likedProducts.Add(new Product { Name = value });
+        }
 
         public Customer()
         {
@@ -72,14 +83,15 @@ namespace SQL_CRM
             _lastName = null;
             _email = null;
             _phoneNr = null;
+            _likedProducts = null;
         }
 
         public Customer(ICustomer cust)
-            : this(cust.CustomerId, cust.FirstName, cust.LastName, cust.Email, cust.PhoneNumber)
+            : this(cust.CustomerId, cust.FirstName, cust.LastName, cust.Email, cust.PhoneNumbers, cust.LikedProducts)
         {
         }
 
-        public Customer(int? id, string firstName, string lastName, string email, string phoneNumber)
+        public Customer(int? id, string firstName, string lastName, string email, string phoneNumber, string likedProduct)
         {
             CustomerId = id;
             FirstName = firstName;
@@ -95,8 +107,18 @@ namespace SQL_CRM
             {
                 _phoneNr = null;
             }
+
+            if (!string.IsNullOrWhiteSpace(likedProduct))
+            {
+                _likedProducts = new List<Product>();
+                AddProduct = likedProduct;
+            }
+            else
+            {
+                _likedProducts = null;
+            }
         }
-        public Customer(int? id, string firstName, string lastName, string email, List<string> phoneNumber)
+        public Customer(int? id, string firstName, string lastName, string email, List<string> phoneNumber, List<Product> likedProducts)
         {
             CustomerId = id;
             FirstName = firstName;
@@ -104,10 +126,12 @@ namespace SQL_CRM
 
             Email = string.IsNullOrWhiteSpace(email) ? null : email;
             PhoneNumbers = phoneNumber == null ? null : new List<string>(phoneNumber);
+            LikedProducts = likedProducts == null ? null : new List<Product>(likedProducts);
+
         }
 
         public Customer(string firstName, string lastName, string email, string phoneNumber)
-            : this(null, firstName, lastName, email, phoneNumber)
+            : this(null, firstName, lastName, email, phoneNumber, null)
         {
         }
 
@@ -125,6 +149,15 @@ namespace SQL_CRM
                     ret += ", " + phone;
                 }
             }
+
+            if (LikedProducts?.Count > 0)
+            {
+                foreach (var product in LikedProducts)
+                {
+                    ret += ", " + product;
+                }
+            }
+
             return ret;
         }
     }

@@ -1,21 +1,19 @@
-﻿using FakeItEasy;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SQL_CRM.UnitTests
 {
     [TestClass]
     public class CustomerDbManagerTests
     {
-        [TestMethod]
-        public void GetCustomerFromFirstNameTest()
-        {
-            var fakecustomer = A.Fake<ICustomer>();
-            var fakelist = new List<ICustomer>();
-            fakelist.Add(fakecustomer);
-            var fakemanager = A.Fake<ICustomerDbManager>();
+        //[TestMethod]
+        //public void GetCustomerFromFirstNameTest()
+        //{
+        //    var fakecustomer = A.Fake<ICustomer>();
+        //    var fakelist = new List<ICustomer>();
+        //    fakelist.Add(fakecustomer);
+        //    var fakemanager = A.Fake<ICustomerDbManager>();
 
-            A.CallTo(() => fakemanager.GetCustomerFromFirstName("Victor")).Returns(fakelist);
-        }
+        //    A.CallTo(() => fakemanager.GetCustomerFromFirstName("Victor")).Returns(fakelist);
+        //}
     }
 }

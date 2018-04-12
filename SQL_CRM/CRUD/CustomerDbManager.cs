@@ -140,7 +140,7 @@ namespace SQL_CRM
             {
                 Program.ErrorMessage(e.ToString());
             }
-            
+
 
             return list.Values.ToList();
         }
@@ -205,7 +205,7 @@ namespace SQL_CRM
 
 
         }
-        
+
         public void Delete(ICustomer customer)
         {
             string sql = "DELETE FROM PhoneNr WHERE CustomerId = @ID; DELETE FROM Customer WHERE Id = @ID";
@@ -307,7 +307,7 @@ namespace SQL_CRM
 
             }
 
-            return new Customer(id, firstName, lastName, email, phoneNumber);
+            return new Customer(id, firstName, lastName, email, phoneNumber, null);
         }
 
         public void DeletePhoneNr(ICustomer customer)
