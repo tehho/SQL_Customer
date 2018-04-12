@@ -6,7 +6,7 @@ namespace SQL_CRM
 {
     internal class Program
     {
-        static ConsoleWindowFrame mainWindow = new ConsoleWindowFrame();
+        static readonly ConsoleWindowFrame mainWindow = new ConsoleWindowFrame();
 
         private static CustomerDbManager _dbManager;
 
@@ -76,7 +76,7 @@ namespace SQL_CRM
                     {
                         SystemMessage("Tabort en kund");
 
-                        Customer customer = FindCustomer();
+                        var customer = FindCustomer();
                         
                         _dbManager.DeleteCustomer(customer);
 
@@ -120,7 +120,7 @@ namespace SQL_CRM
             mainWindow.Abort();
         }
 
-        private static Customer ChangeCustomer(Customer customer)
+        private static ICustomer ChangeCustomer(ICustomer customer)
         {
             PrintCustomer(customer);
 
@@ -129,27 +129,27 @@ namespace SQL_CRM
             return ret;
         }
 
-        private static void ChangeCustomerFirstName(Customer customer)
+        private static void ChangeCustomerFirstName(ICustomer customer)
         {
             customer.FirstName = mainWindow.GetInputWithQuestion("Vad är kundens förnamn:");
         }
 
-        private static void ChangeCustomerLastName(Customer customer)
+        private static void ChangeCustomerLastName(ICustomer customer)
         {
             customer.LastName = mainWindow.GetInputWithQuestion("Vad är kundens efternamn:");
         }
 
-        private static void ChangeCustomerEmail(Customer customer)
+        private static void ChangeCustomerEmail(ICustomer customer)
         {
             customer.Email = mainWindow.GetInputWithQuestion("Vad är kundens epost:");
         }
 
-        private static void ChangeCustomerPhoneNumber(Customer customer)
+        private static void ChangeCustomerPhoneNumber(ICustomer customer)
         {
             customer.PhoneNumber = mainWindow.GetInputWithQuestion("Vad är kundens telefonnumer:");
         }
 
-        private static Customer FillCustomer(string question, string exit)
+        private static ICustomer FillCustomer(string question, string exit)
         {
             Customer customer = new Customer();
 
@@ -180,9 +180,9 @@ namespace SQL_CRM
             return customer;
         }
 
-        private static Customer FindCustomer()
+        private static ICustomer FindCustomer()
         {
-            Customer customer = FillCustomer("Vad vill du söka på, välj sök när du är klar", "Sök");
+            var customer = FillCustomer("Vad vill du söka på, välj sök när du är klar", "Sök");
             
 
             var list = _dbManager.GetCustomersFromCustomer(customer);
@@ -199,16 +199,17 @@ namespace SQL_CRM
             {
                 try
                 {
+                    var temp_List = list.Select(
+                        (item) =>
+                        {
+                            var ret = $"{item.ToString()}";
 
-                    var input = mainWindow.GetInputWithQuestion(new Question("Vilken kund vill du välja", list.Select(
-                            (item) =>
-                            {
-                                var ret = $"{item}";
+                            return ret;
+                        }).ToList();
+                    var input = mainWindow.GetInputWithQuestion(new Question("Vilken kund vill du välja", temp_List.ToArray()));
 
-                                return ret;
-                            }).ToArray()));
-
-                    return list.Find((item) => item.ToString() == input);
+                    customer = list.Find((item) => item.ToString() == input);
+                    return customer;
                 }
                 catch (FormatException e)
                 {
@@ -235,7 +236,7 @@ namespace SQL_CRM
             return customer;
         }
 
-        public static void PrintCustomer(Customer customer)
+        public static void PrintCustomer(ICustomer customer)
         {
             mainWindow.Add(new WebMessage("Customer", customer.ToString(), ConsoleColor.Green));
         }

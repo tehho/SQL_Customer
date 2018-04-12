@@ -11,7 +11,7 @@ namespace SQL_CRM
 
         }
 
-        public void UpdateCustomer(Customer customer)
+        public void UpdateCustomer(ICustomer customer)
         {
             var where = new List<string>();
             Action<SqlCommand> setParameters = null;
@@ -67,7 +67,7 @@ namespace SQL_CRM
 
         }
 
-        public void DeleteCustomer(Customer customer)
+        public void DeleteCustomer(ICustomer customer)
         {
             string sql = "DELETE FROM PhoneNr WHERE CustomerId = @ID; DELETE FROM Customer WHERE Id = @ID";
 
@@ -79,7 +79,7 @@ namespace SQL_CRM
                 });
         }
 
-        public void CreateCustomer(Customer customer)
+        public void CreateCustomer(ICustomer customer)
         {
             var sql = $"DECLARE @CustomerId int " +
                       $"INSERT INTO Customer (FirstName, LastName";
@@ -123,7 +123,7 @@ namespace SQL_CRM
             });
         }
 
-        public List<Customer> GetCustomerFromLastName(string lastName)
+        public List<ICustomer> GetCustomerFromLastName(string lastName)
         {
             return GetCustomersFromCustomer(new Customer()
             {
@@ -131,7 +131,7 @@ namespace SQL_CRM
             });
         }
 
-        public List<Customer> GetCustomerFromEmail(string email)
+        public List<ICustomer> GetCustomerFromEmail(string email)
         {
             return GetCustomersFromCustomer(new Customer()
             {
@@ -139,7 +139,7 @@ namespace SQL_CRM
             });
         }
 
-        public List<Customer> GetCustomerFromPhoneNumber(string phoneNumber)
+        public List<ICustomer> GetCustomerFromPhoneNumber(string phoneNumber)
         {
             return GetCustomersFromCustomer(new Customer()
             {
@@ -147,9 +147,9 @@ namespace SQL_CRM
             });
         }
 
-        public List<Customer> GetCustomersFromCustomer(Customer customer)
+        public List<ICustomer> GetCustomersFromCustomer(ICustomer customer)
         {
-            var list = new List<Customer>();
+            var list = new List<ICustomer>();
 
             var where = new List<string>();
             Action<SqlCommand> setParameters = null;
@@ -225,14 +225,14 @@ namespace SQL_CRM
             return list;
         }
 
-        public List<Customer> GetAllCustomer()
+        public List<ICustomer> GetAllCustomer()
         {
             return GetCustomersFromCustomer(null);
         }
 
-        private List<Customer> GetCustomers(string sql, Action<SqlCommand> setParameter, Func<SqlDataReader, Customer> readerMethod)
+        private List<ICustomer> GetCustomers(string sql, Action<SqlCommand> setParameter, Func<SqlDataReader, Customer> readerMethod)
         {
-            List<Customer> list = new List<Customer>();
+            List<ICustomer> list = new List<ICustomer>();
 
             Query(sql, (command) =>
             {
@@ -250,7 +250,7 @@ namespace SQL_CRM
             return list;
         }
 
-        private Customer CreateCustomerFromSqlReader(SqlDataReader reader)
+        private ICustomer CreateCustomerFromSqlReader(SqlDataReader reader)
         {
             string email = null;
             string phoneNumber = null;

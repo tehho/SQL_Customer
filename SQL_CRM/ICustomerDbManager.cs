@@ -6,15 +6,15 @@ namespace SQL_CRM
 {
     public interface ICustomerDbManager
     {
-        void UpdateCustomer(Customer customer);
-        void DeleteCustomer(Customer customer);
-        void CreateCustomer(Customer customer);
+        void UpdateCustomer(ICustomer customer);
+        void DeleteCustomer(ICustomer customer);
+        void CreateCustomer(ICustomer customer);
         List<ICustomer> GetCustomerFromFirstName(string firstName);
-        List<Customer> GetCustomerFromLastName(string lastName);
-        List<Customer> GetCustomerFromEmail(string email);
-        List<Customer> GetCustomerFromPhoneNumber(string phoneNumber);
-        List<Customer> GetCustomersFromCustomer(Customer customer);
-        List<Customer> GetAllCustomer();
+        List<ICustomer> GetCustomerFromLastName(string lastName);
+        List<ICustomer> GetCustomerFromEmail(string email);
+        List<ICustomer> GetCustomerFromPhoneNumber(string phoneNumber);
+        List<ICustomer> GetCustomersFromCustomer(ICustomer customer);
+        List<ICustomer> GetAllCustomer();
         void Query(string sqlQuery, Action<SqlCommand> method);
     }
 }

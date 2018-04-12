@@ -14,7 +14,7 @@
         {
         }
 
-        public Customer(Customer cust)
+        public Customer(ICustomer cust)
             : this(cust.CustomerId, cust.FirstName, cust.LastName, cust.Email, cust.PhoneNumber)
         {
         }
@@ -36,7 +36,7 @@
 
         public override string ToString()
         {
-            string ret = $"{FirstName} {LastName}";
+            var ret = $"{FirstName} {LastName}";
 
             if (!string.IsNullOrEmpty(Email))
                 ret += $", {Email}";
