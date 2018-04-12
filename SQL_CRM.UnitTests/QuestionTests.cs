@@ -19,8 +19,6 @@ namespace SQL_CRM.UnitTests
             Assert.AreEqual("Another Test", question.answers[2].answer);
         }
 
-
-        //TODO Rewrite, method now returns correct string, if not throws exception.
         [TestMethod]
         public void TestCheck_InputIsInAnswers_ReturnTrue()
         {

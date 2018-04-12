@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Data.SqlTypes;
 
 namespace SQL_CRM
 {
-    internal class CustomerDbManager : DbManager
+    internal class CustomerDbManager : DbManager, ICustomerDbManager
     {
         public CustomerDbManager(string conString) : base(conString)
         {
@@ -65,7 +64,7 @@ namespace SQL_CRM
                 }
             }
 
-            
+
         }
 
         public void DeleteCustomer(Customer customer)
