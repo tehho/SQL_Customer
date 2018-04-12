@@ -66,7 +66,8 @@ namespace SQL_CRM
 
             var sql =
                 "SELECT [Customer].Id, [Customer].FirstName, [Customer].LastName, [Customer].Email, [PhoneNr].PhoneNr " +
-                "FROM Customer ";
+                "FROM Customer " +
+                "LEFT JOIN PhoneNr ON Customer.Id = PhoneNr.CustomerId ";
 
             if (customer != null)
             {
@@ -92,7 +93,7 @@ namespace SQL_CRM
                 {
                     for (int i = 0; i < customer.PhoneNumbers.Count; i++)
                     {
-                        where.Add("PhoneNr = @PhoneNr{i} ");
+                        where.Add("[PhoneNr].PhoneNr = @PhoneNr{i} ");
                         setParameters += (command) => command.Parameters.Add(new SqlParameter($"PhoneNr{i}", customer.PhoneNumber[i]));
                     }
                 }
@@ -103,26 +104,38 @@ namespace SQL_CRM
                 sql += " Where " + string.Join(" AND ", where);
             }
 
-
-            Query(sql, (command) =>
+            try
             {
-                setParameters?.Invoke(command);
-
-                var reader = command.ExecuteReader();
-                while (reader.Read())
+                Query(sql, (command) =>
                 {
-                    customer = CreateCustomerFromSqlReader(reader);
+                    setParameters?.Invoke(command);
 
-                    if (customer.PhoneNumber != null && list.ContainsKey(customer.CustomerId.Value))
+                    var reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
-                        list[customer.CustomerId.Value].PhoneNumber = customer.PhoneNumber;
+                        customer = CreateCustomerFromSqlReader(reader);
+
+                        if (customer.PhoneNumber != null && list.ContainsKey(customer.CustomerId.Value))
+                        {
+                            list[customer.CustomerId.Value].PhoneNumber = customer.PhoneNumber;
+                        }
+                        else
+                        {
+                            list.Add(customer.CustomerId.Value, customer);
+                        }
                     }
-                    else
-                    {
-                        list.Add(customer.CustomerId.Value, customer);
-                    }
-                }
-            });
+                });
+            }
+            catch (SqlException sqle)
+            {
+                Program.ErrorMessage(sqle.Message);
+
+            }
+            catch (Exception e)
+            {
+                Program.ErrorMessage(e.ToString());
+            }
+            
 
             return list.Values.ToList();
         }
@@ -160,12 +173,13 @@ namespace SQL_CRM
                     sql += $" WHERE Customer.Id = @CustomerId;";
                 }
 
-                if (customer.PhoneNumber != null)
+                if (customer.PhoneNumbers != null)
                 {
                     for (int i = 0; i < customer.PhoneNumbers.Count; i++)
                     {
-                        sql += $" INSERT INTO PhoneNr (PhoneNr, CustomerId) VALUES (@PhoneNr{i}, @CustomerId);";
-                        setParameters += (command) => command.Parameters.Add(new SqlParameter($"PhoneNr{i}", customer.PhoneNumber));
+                        sql += $" INSERT INTO PhoneNr (PhoneNr, CustomerId) VALUES (@PhoneNr{i.ToString()}, @CustomerId);";
+                        var temp = $"PhoneNr{i}";
+                        setParameters += (command) => command.Parameters.Add(new SqlParameter(temp, customer.PhoneNumber));
                     }
 
                 }
@@ -186,7 +200,7 @@ namespace SQL_CRM
 
 
         }
-
+        
         public void Delete(ICustomer customer)
         {
             string sql = "DELETE FROM PhoneNr WHERE CustomerId = @ID; DELETE FROM Customer WHERE Id = @ID";
@@ -236,74 +250,6 @@ namespace SQL_CRM
             return Read(null);
         }
 
-        public void UpdateCustomer(ICustomer customer)
-        {
-            var where = new List<string>();
-            Action<SqlCommand> setParameters = null;
-
-            if (customer != null)
-            {
-                if (customer.FirstName != null)
-                {
-                    where.Add("Customer.FirstName = @FName");
-                    setParameters += (command) => command.Parameters.Add(new SqlParameter("FName", customer.FirstName));
-                }
-
-                if (customer.LastName != null)
-                {
-                    where.Add("Customer.LastName = @LName");
-                    setParameters += (command) => command.Parameters.Add(new SqlParameter("LName", customer.LastName));
-                }
-
-                if (customer.Email != null)
-                {
-                    where.Add("Customer.Email = @Email");
-                    setParameters += (command) => command.Parameters.Add(new SqlParameter("Email", customer.Email));
-                }
-
-                string sql = "";
-                if (where.Count != 0)
-                {
-                    sql += $"UPDATE Customer " +
-                              $"SET " + string.Join(", ", where);
-                    sql += $" WHERE Customer.Id = @CustomerId;";
-                }
-
-                if (customer.PhoneNumber != null)
-                {
-                    sql += $" INSERT INTO PhoneNr (PhoneNr, CustomerId) VALUES (@PhoneNr, @CustomerId);";
-                    setParameters += (command) => command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
-                }
-
-                if (sql != "")
-                {
-                    Query(sql,
-                        (command) =>
-                        {
-                            setParameters?.Invoke(command);
-
-                            command.Parameters.Add(new SqlParameter("CustomerId", customer.CustomerId));
-
-                            command.ExecuteNonQuery();
-                        });
-                }
-            }
-
-
-        }
-
-        public void DeleteCustomer(ICustomer customer)
-        {
-            string sql = "DELETE FROM PhoneNr WHERE CustomerId = @ID; DELETE FROM Customer WHERE Id = @ID";
-
-            Query(sql, (command) =>
-                {
-                    command.Parameters.Add(new SqlParameter("ID", customer.CustomerId));
-
-                    command.ExecuteNonQuery();
-                });
-        }
-
         private static ICustomer CreateCustomerFromSqlReader(SqlDataReader reader)
         {
             string email = null;
@@ -331,6 +277,22 @@ namespace SQL_CRM
             }
 
             return new Customer(id, firstName, lastName, email, phoneNumber);
+        }
+
+        public void DeletePhoneNr(ICustomer customer)
+        {
+            if (customer?.CustomerId != null && customer.PhoneNumber != null)
+            {
+                var sql = $"DELETE FROM PhoneNr WHERE CustomerId = @CustomerId AND PhoneNr = @PhoneNr";
+
+                Query(sql, (command) =>
+                {
+                    command.Parameters.Add(new SqlParameter("CustomerId", customer.CustomerId));
+                    command.Parameters.Add(new SqlParameter("PhoneNr", customer.PhoneNumber));
+
+                    command.ExecuteNonQuery();
+                });
+            }
         }
     }
 }

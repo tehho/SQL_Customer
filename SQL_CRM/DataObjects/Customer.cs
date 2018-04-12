@@ -40,7 +40,7 @@ namespace SQL_CRM
 
         public string PhoneNumber
         {
-            get => _phoneNr?[0];
+            get => _phoneNr?.Count == 0 ? null : _phoneNr?[0];
             set
             {
                 if (!string.IsNullOrWhiteSpace(value))
@@ -83,7 +83,7 @@ namespace SQL_CRM
             LastName = lastName;
 
             Email = string.IsNullOrWhiteSpace(email) ? null : email;
-            if (string.IsNullOrWhiteSpace(phoneNumber))
+            if (!string.IsNullOrWhiteSpace(phoneNumber))
             {
                 _phoneNr = new List<string>();
                 AddPhoneNumber = phoneNumber;
@@ -117,7 +117,10 @@ namespace SQL_CRM
 
             if (PhoneNumbers?.Count > 0)
             {
-                ret += string.Join(", ", PhoneNumber);
+                foreach (var phone in PhoneNumbers)
+                {
+                    ret += ", " + phone;
+                }
             }
             return ret;
         }

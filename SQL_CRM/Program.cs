@@ -7,91 +7,39 @@ namespace SQL_CRM
     {
         static readonly ConsoleWindowFrame mainWindow = new ConsoleWindowFrame();
 
-        private static CustomerDbManager _dbManager;
+        private static CustomerDbManager CustomerDbManager;
+        private static ProductDbManager ProductDbManager;
 
         private static void Main(string[] args)
         {
-            _dbManager =
+            CustomerDbManager =
                 new CustomerDbManager(System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"].ConnectionString);
+
+            ProductDbManager = 
+                new ProductDbManager(System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"].ConnectionString);
 
             mainWindow.Width = 80;
             mainWindow.Height = 20;
 
             mainWindow.StartRender();
 
-            var mainQuestion = new Question(
-                "Skriv in ett val",
-                "Skapa en kund,Ny kund,Ny",
-                "Visa alla kunder,Visa",
-                "Ändra en kund,Ändra",
-                "Tabort en kund,Tabort",
-                "Rensa skärmen,Rensa,Cls",
-                "Avsluta,Quit,Exit"
-            );
-
             var running = true;
+
+            var mainQuestion = new Question("Vad vill du göra", "Administrera en kund,Kund", "Administrera en produkt,Produkt", "Rensa skärmen,CLS", "Avsluta,Quit,Exit");
 
             while (running)
             {
                 try
                 {
                     var input = mainWindow.GetInputWithQuestion(mainQuestion);
-                    if (input == "Skapa en kund")
+
+                    if (input == "Administrera en kund")
                     {
-                        SystemMessage("Skapa en kund!");
-
-                        var customer = CreateCustomer();
-
-                        _dbManager.Create(customer);
-
-                        SystemMessage($"Ny kund skapad {customer}");
+                        AdministrateCustomer();
                     }
-                    else if (input == "Ändra en kund")
+                    else if (input == "Administrera en produkt")
                     {
-                        SystemMessage("Ändra en kund");
-
-                        var customer = FindCustomer();
-
-                        SystemMessage("Hittat kund:");
-                        PrintCustomer(customer);
-
-                        var newcustomer = ChangeCustomer(customer);
-
-                        _dbManager.Update(newcustomer);
-
-
-                        SystemMessage("Ändrat värden:");
-
-                        if (newcustomer.FirstName != null)
-                            SystemMessage($"Förnamn: {customer.FirstName} {newcustomer.FirstName}");
-                        if (newcustomer.LastName != null)
-                            SystemMessage($"Efternamn: {customer.LastName} {newcustomer.LastName}");
-                        if (newcustomer.Email != null)
-                            SystemMessage($"Epost: {customer.Email} {newcustomer.Email}");
-                        if (newcustomer.PhoneNumber != null)
-                            SystemMessage($"Telefonnummer: {customer.PhoneNumber} {newcustomer.PhoneNumber}");
-                    }
-                    else if (input == "Tabort en kund")
-                    {
-                        SystemMessage("Tabort en kund");
-
-
-                        var customer = FindCustomer();
-                        _dbManager.Delete(customer);
-
-                        SystemMessage("Tog bort kund:");
-                        PrintCustomer(customer);
-                    }
-                    else if (input == "Visa alla kunder")
-                    {
-                        SystemMessage("Hämtar alla kunder:");
-
-                        var list = _dbManager.GetAllCustomer();
-
-                        foreach (var customer in list)
-                        {
-                            PrintCustomer(customer);
-                        }
+                        AdministrateProduct();
                     }
                     else if (input == "Rensa skärmen")
                     {
@@ -101,11 +49,6 @@ namespace SQL_CRM
                     {
                         running = false;
                     }
-                    else
-                    {
-                        ErrorMessage("No valid input");
-                    }
-
                     mainWindow.AddSeparator();
                 }
                 catch (Exception e)
@@ -119,17 +62,173 @@ namespace SQL_CRM
             mainWindow.Abort();
         }
 
-        private static ICustomer CreateCustomer()
+        private static void AdministrateCustomer()
         {
+            var mainQuestion = new Question(
+                "Skriv in ett val",
+                "Skapa en kund,Ny kund,Ny",
+                "Visa alla kunder,Visa",
+                "Ändra en kund,Ändra",
+                "Lägg till ett telefonnummer på befintlig kund, Lägg till, Telefon",
+                "Tabort en kund,Tabort",
+                "Tabort ett telefonnummer på en kund,Tabort telefon",
+                "Tillbaka"
+            );
 
+            var input = mainWindow.GetInputWithQuestion(mainQuestion);
+
+            if (input == "Skapa en kund")
+            {
+                CreateCustomer();
+            }
+            else if (input == "Visa alla kunder")
+            {
+                ReadAllCustomers();
+            }
+            else if (input == "Ändra en kund")
+            {
+                UpdateCustomer();
+            }
+            else if (input == "Lägg till ett telefonnummer på befintlig kund")
+            {
+                AddPhoneNr();
+            }
+            else if (input == "Tabort en kund")
+            {
+                DeleteCustomer();
+            }
+            else if (input == "Tabort ett telefonnummer på en kund")
+            {
+                DeletePhoneNr();
+            }
+        }
+        
+        private static void AdministrateProduct()
+        {
+            var mainQuestion = new Question("Skriv in ett val", "Skapa en produkt,Skapa", "Visa alla produkter,Visa", "Ändra en produkt,Ändra", "Tabort en produkt,Tabort", "Tillbaka");
+
+            var input = mainWindow.GetInputWithQuestion(mainQuestion);
+
+            if (input == "Skapa en produkt")
+            {
+                throw new NotImplementedException();
+            }
+            else if (input == "Visa alla produkter")
+            {
+                throw new NotImplementedException();
+            }
+            else if (input == "Ändra en produkt")
+            {
+                throw new NotImplementedException();
+            }
+            else if (input == "Tabort en produkt")
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        private static void CreateCustomer()
+        {
+            SystemMessage("Skapa en kund!");
+            
             var firstName = mainWindow.GetInputWithQuestion("Skriv in kundens förnamn:");
             var lastName = mainWindow.GetInputWithQuestion("Skriv in kundens efternamn:");
-            var Email = mainWindow.GetInputWithQuestion("Skriv in kundens email, lämna tomt om saknas:");
-            var PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in kundens telefonnummer, lämna tomt om saknas:");
+            var email = mainWindow.GetInputWithQuestion("Skriv in kundens email, lämna tomt om saknas:");
+            var phoneNumber = mainWindow.GetInputWithQuestion("Skriv in kundens telefonnummer, lämna tomt om saknas:");
 
-            var customer = new Customer(firstName, lastName, Email, PhoneNumber);
+            var customer = new Customer(firstName, lastName, email, phoneNumber);
 
-            return customer;
+            CustomerDbManager.Create(customer);
+
+            SystemMessage($"Ny kund skapad {customer}");
+        }
+
+        private static void ReadAllCustomers()
+        {
+            SystemMessage("Hämtar alla kunder:");
+
+            var list = CustomerDbManager.GetAllCustomer();
+
+            foreach (var customer in list)
+            {
+                PrintCustomer(customer);
+            }
+        }
+
+        private static void UpdateCustomer()
+        {
+            SystemMessage("Ändra en kund");
+
+            var customer = FindCustomer();
+
+            if (customer != null)
+            {
+                SystemMessage("Hittat kund:");
+                PrintCustomer(customer);
+
+                var newcustomer = ChangeCustomer(customer);
+
+                CustomerDbManager.Update(newcustomer);
+
+
+                SystemMessage("Ändrat värden:");
+
+                if (newcustomer.FirstName != null)
+                    SystemMessage($"Förnamn: {customer.FirstName} {newcustomer.FirstName}");
+                if (newcustomer.LastName != null)
+                    SystemMessage($"Efternamn: {customer.LastName} {newcustomer.LastName}");
+                if (newcustomer.Email != null)
+                    SystemMessage($"Epost: {customer.Email} {newcustomer.Email}");
+                if (newcustomer.PhoneNumber != null)
+                    SystemMessage($"Telefonnummer: {customer.PhoneNumber} {newcustomer.PhoneNumber}");
+            }
+            else
+            {
+                ErrorMessage("No customer found");
+            }
+        }
+
+        private static void AddPhoneNr()
+        {
+            SystemMessage("Lägg till telefonnummer på befintligt kund");
+
+            var customer = new Customer()
+            {
+                CustomerId = FindCustomer().CustomerId,
+                PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in ett telefonnummer:")
+
+            };
+            
+            CustomerDbManager.Update(customer);
+        }
+
+        private static void DeleteCustomer()
+        {
+            SystemMessage("Tabort en kund");
+            
+            var customer = FindCustomer();
+            CustomerDbManager.Delete(customer);
+
+            SystemMessage("Tog bort kund:");
+            PrintCustomer(customer);
+        }
+
+        private static void DeletePhoneNr()
+        {
+            SystemMessage("Tabort ett telefonnummer på en kund");
+
+            var customer = FindCustomer();
+
+            if (customer.PhoneNumbers.Count == 1)
+            {
+                customer = new Customer()
+                {
+                    CustomerId = customer.CustomerId,
+                    PhoneNumber =  customer.PhoneNumber
+                };
+                CustomerDbManager.DeletePhoneNr(customer);
+            }
+
         }
 
         private static ICustomer ChangeCustomer(ICustomer customer)
@@ -177,7 +276,7 @@ namespace SQL_CRM
 
             var customer = FillCustomer("Vad vill du söka på, välj sök när du är klar", "Sök");
 
-            var list = _dbManager.Read(customer);
+            var list = CustomerDbManager.Read(customer);
 
             if (list.Count == 1)
                 return list[0];
@@ -209,12 +308,7 @@ namespace SQL_CRM
                 }
             }
         }
-
-        private static void DeleteCustomer()
-        {
-
-        }
-
+        
         public static void PrintCustomer(ICustomer customer)
         {
             mainWindow.Add(new WebMessage("Customer", customer.ToString(), ConsoleColor.Green));
