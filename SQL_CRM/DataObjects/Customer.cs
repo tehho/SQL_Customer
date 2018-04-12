@@ -1,18 +1,15 @@
-﻿namespace SQL_CRM
+﻿using System.Collections.Generic;
+
+namespace SQL_CRM
 {
     public class Customer : ICustomer
     {
-        private int? _customerId;
         private string _firstName;
         private string _lastName;
         private string _email;
-        private string _phoneNr;
+        private List<string> _phoneNr;
 
-        public int? CustomerId
-        {
-            get { return _customerId; }
-            set { _customerId = value; }
-        }
+        public int? CustomerId { get; set; }
 
         public string FirstName
         {
@@ -28,21 +25,50 @@
             get => _lastName;
             set => _lastName = value?.Trim();
         }
+
         public string Email
         {
             get => _email;
             set => _email = value?.Trim();
         }
 
-        public string PhoneNumber
+        public List<string> PhoneNumbers
         {
             get => _phoneNr;
-            set => _phoneNr = value?.Trim();
+            set => _phoneNr = value == null ? null : new List<string>(value);
         }
 
-        public Customer()
-            : this(null, null, null, null, null)
+        public string PhoneNumber
         {
+            get => _phoneNr?[0];
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    if (_phoneNr == null)
+                    {
+                        _phoneNr = new List<string>()
+                        {
+                            value
+                        };
+                    }
+                    else
+                    {
+                        _phoneNr.Add(value.Trim());
+                    }
+                }
+            }
+        }
+
+        public string AddPhoneNumber { set => _phoneNr.Add(value.Trim()); }
+
+        public Customer()
+        {
+            CustomerId = null;
+            _firstName = null;
+            _lastName = null;
+            _email = null;
+            _phoneNr = null;
         }
 
         public Customer(ICustomer cust)
@@ -57,7 +83,24 @@
             LastName = lastName;
 
             Email = string.IsNullOrWhiteSpace(email) ? null : email;
-            PhoneNumber = string.IsNullOrWhiteSpace(phoneNumber) ? null : phoneNumber;
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                _phoneNr = new List<string>();
+                AddPhoneNumber = phoneNumber;
+            }
+            else
+            {
+                _phoneNr = null;
+            }
+        }
+        public Customer(int? id, string firstName, string lastName, string email, List<string> phoneNumber)
+        {
+            CustomerId = id;
+            FirstName = firstName;
+            LastName = lastName;
+
+            Email = string.IsNullOrWhiteSpace(email) ? null : email;
+            PhoneNumbers = phoneNumber == null ? null : new List<string>(phoneNumber);
         }
 
         public Customer(string firstName, string lastName, string email, string phoneNumber)
@@ -72,8 +115,10 @@
             if (!string.IsNullOrEmpty(Email))
                 ret += $", {Email}";
 
-            if (!string.IsNullOrEmpty(PhoneNumber))
-                ret += $", {PhoneNumber}";
+            if (PhoneNumbers?.Count > 0)
+            {
+                ret += string.Join(", ", PhoneNumber);
+            }
             return ret;
         }
     }

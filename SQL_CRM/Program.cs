@@ -166,7 +166,7 @@ namespace SQL_CRM
                 }
                 else if (input == "Telefonnummer")
                 {
-                    customer.PhoneNumber = mainWindow.GetInputWithQuestion("Skriv in ett telefonnummer:");
+                    customer.AddPhoneNumber = mainWindow.GetInputWithQuestion("Skriv in ett telefonnummer:");
                 }
             } while (input != exit);
 

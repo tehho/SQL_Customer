@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace SQL_CRM
 {
@@ -49,17 +50,15 @@ namespace SQL_CRM
         
         public List<ICustomer> GetCustomersFromCustomer(ICustomer customer)
         {
-            var list = new List<ICustomer>();
+            var list = new Dictionary<int, ICustomer>();
 
             var where = new List<string>();
             Action<SqlCommand> setParameters = null;
 
-            var sql = "SELECT [Customer].Id, [Customer].FirstName, [Customer].LastName, [Customer].Email, " +
-                        "stuff(" +
-                        "( " +
-                            "SELECT cast(', ' AS VARCHAR(max)) + [PhoneNr].PhoneNr " +
-                            "FROM PhoneNr " +
-                            "WHERE PhoneNr.CustomerId = Customer.Id ";
+            var sql =
+                "SELECT [Customer].Id, [Customer].FirstName, [Customer].LastName, [Customer].Email, [PhoneNr].PhoneNr " +
+                "FROM Customer ";
+
 
             if (customer != null)
             {
@@ -92,19 +91,17 @@ namespace SQL_CRM
 
                 if (customer.PhoneNumber != null)
                 {
-                    sql += " AND PhoneNr LIKE @PhoneNr ";
-                    setParameters += (command) =>
+                    for (int i = 0; i < customer.PhoneNumbers.Count; i++)
                     {
-                        command.Parameters.Add(new SqlParameter("PhoneNr", $"%{customer.PhoneNumber}%"));
-                    };
+
+                        where.Add("PhoneNr = @PhoneNr{i} ");
+                        setParameters += (command) =>
+                        {
+                            command.Parameters.Add(new SqlParameter($"PhoneNr{i}", customer.PhoneNumber[i]));
+                        };
+                    }
                 }
             }
-
-            sql += "FOR xml path('')" +
-                   ")" +
-                   ", 1, 1, ''" +
-                   ") AS Phone " +
-                   "FROM Customer";
             if (where.Count != 0)
             {
                 sql += " Where " + string.Join(" AND ", where);
@@ -118,11 +115,24 @@ namespace SQL_CRM
                 var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    list.Add(CreateCustomerFromSqlReader(reader));
+                    customer = CreateCustomerFromSqlReader(reader);
+
+                    if (customer.PhoneNumber != null)
+                    {
+                        if (list.ContainsKey(customer.CustomerId.Value))
+                        {
+                            list[customer.CustomerId.Value].PhoneNumber = customer.PhoneNumber;
+                        }
+                        list.Add(customer.CustomerId.Value, customer);
+                    }
+                    else
+                    {
+                        list.Add(customer.CustomerId.Value, customer);
+                    }
                 }
             });
 
-            return list;
+            return list.Values.ToList();
         }
         
         public List<ICustomer> GetAllCustomer()
@@ -224,10 +234,10 @@ namespace SQL_CRM
 
         public List<ICustomer> GetCustomerFromPhoneNumber(string phoneNumber)
         {
-            return GetCustomersFromCustomer(new Customer()
-            {
-                PhoneNumber = phoneNumber
-            });
+            var customer = new Customer {AddPhoneNumber = phoneNumber};
+
+
+            return GetCustomersFromCustomer(customer);
         }
 
         private static ICustomer CreateCustomerFromSqlReader(SqlDataReader reader)
