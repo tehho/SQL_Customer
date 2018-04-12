@@ -29,7 +29,7 @@ namespace SQL_CRM
 
         public override string ToString()
         {
-            return ! string.IsNullOrWhiteSpace(_sender) ? $"{_sender}: {_message}" : _message;
+            return !string.IsNullOrWhiteSpace(_sender) ? $"{_sender}: {_message}" : _message;
         }
     }
 }

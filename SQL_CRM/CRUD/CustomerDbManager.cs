@@ -4,14 +4,14 @@ using System.Data.SqlClient;
 
 namespace SQL_CRM
 {
-    public class CustomerDbManager : DbManager, ICustomerDbManager
+    public class CustomerDbManager : DbManager, ICustomerDbManager, ICrud<ICustomer>
     {
         public CustomerDbManager(string conString) : base(conString)
         {
 
         }
 
-        public void UpdateCustomer(ICustomer customer)
+        public void Update(ICustomer customer)
         {
             var where = new List<string>();
             Action<SqlCommand> setParameters = null;
@@ -67,7 +67,7 @@ namespace SQL_CRM
 
         }
 
-        public void DeleteCustomer(ICustomer customer)
+        public void Delete(ICustomer customer)
         {
             string sql = "DELETE FROM PhoneNr WHERE CustomerId = @ID; DELETE FROM Customer WHERE Id = @ID";
 
@@ -79,7 +79,7 @@ namespace SQL_CRM
                 });
         }
 
-        public void CreateCustomer(ICustomer customer)
+        public void Create(ICustomer customer)
         {
             var sql = $"DECLARE @CustomerId int " +
                       $"INSERT INTO Customer (FirstName, LastName";
@@ -117,7 +117,7 @@ namespace SQL_CRM
 
         public List<ICustomer> GetCustomerFromFirstName(string firstName)
         {
-            return GetCustomersFromCustomer(new Customer()
+            return Read(new Customer()
             {
                 FirstName = firstName
             });
@@ -125,7 +125,7 @@ namespace SQL_CRM
 
         public List<ICustomer> GetCustomerFromLastName(string lastName)
         {
-            return GetCustomersFromCustomer(new Customer()
+            return Read(new Customer()
             {
                 LastName = lastName
             });
@@ -133,7 +133,7 @@ namespace SQL_CRM
 
         public List<ICustomer> GetCustomerFromEmail(string email)
         {
-            return GetCustomersFromCustomer(new Customer()
+            return Read(new Customer()
             {
                 Email = email
             });
@@ -141,13 +141,13 @@ namespace SQL_CRM
 
         public List<ICustomer> GetCustomerFromPhoneNumber(string phoneNumber)
         {
-            return GetCustomersFromCustomer(new Customer()
+            return Read(new Customer()
             {
                 PhoneNumber = phoneNumber
             });
         }
 
-        public List<ICustomer> GetCustomersFromCustomer(ICustomer customer)
+        public List<ICustomer> Read(ICustomer customer)
         {
             var list = new List<ICustomer>();
 
@@ -227,7 +227,7 @@ namespace SQL_CRM
 
         public List<ICustomer> GetAllCustomer()
         {
-            return GetCustomersFromCustomer(null);
+            return Read(null);
         }
 
         private List<ICustomer> GetCustomers(string sql, Action<SqlCommand> setParameter, Func<SqlDataReader, Customer> readerMethod)

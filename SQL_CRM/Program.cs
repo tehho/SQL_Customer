@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SQL_CRM
 {
-    internal class Program
+    public class Program
     {
         static readonly ConsoleWindowFrame mainWindow = new ConsoleWindowFrame();
 
@@ -43,7 +42,7 @@ namespace SQL_CRM
 
                         var customer = CreateCustomer();
 
-                        _dbManager.CreateCustomer(customer);
+                        _dbManager.Create(customer);
 
                         SystemMessage($"Ny kund skapad {customer}");
                     }
@@ -58,7 +57,7 @@ namespace SQL_CRM
 
                         var newcustomer = ChangeCustomer(customer);
 
-                        _dbManager.UpdateCustomer(newcustomer);
+                        _dbManager.Update(newcustomer);
 
 
                         SystemMessage("Ändrat värden:");
@@ -76,9 +75,9 @@ namespace SQL_CRM
                     {
                         SystemMessage("Tabort en kund");
 
-       
+
                         var customer = FindCustomer();
-                        _dbManager.DeleteCustomer(customer);
+                        _dbManager.Delete(customer);
 
                         SystemMessage("Tog bort kund:");
                         PrintCustomer(customer);
@@ -185,7 +184,7 @@ namespace SQL_CRM
 
             var customer = FillCustomer("Vad vill du söka på, välj sök när du är klar", "Sök");
 
-            var list = _dbManager.GetCustomersFromCustomer(customer);
+            var list = _dbManager.Read(customer);
 
             if (list.Count == 1)
                 return list[0];
