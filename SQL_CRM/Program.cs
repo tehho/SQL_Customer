@@ -52,7 +52,7 @@ namespace SQL_CRM
                         SystemMessage("Ändra en kund");
 
                         var customer = FindCustomer();
-                        
+
                         SystemMessage("Hittat kund:");
                         PrintCustomer(customer);
 
@@ -76,8 +76,8 @@ namespace SQL_CRM
                     {
                         SystemMessage("Tabort en kund");
 
+       
                         var customer = FindCustomer();
-                        
                         _dbManager.DeleteCustomer(customer);
 
                         SystemMessage("Tog bort kund:");
@@ -182,8 +182,8 @@ namespace SQL_CRM
 
         private static ICustomer FindCustomer()
         {
+
             var customer = FillCustomer("Vad vill du söka på, välj sök när du är klar", "Sök");
-            
 
             var list = _dbManager.GetCustomersFromCustomer(customer);
 
@@ -220,7 +220,7 @@ namespace SQL_CRM
 
         private static void DeleteCustomer()
         {
-            
+
         }
 
         private static Customer CreateCustomer()
@@ -240,7 +240,7 @@ namespace SQL_CRM
         {
             mainWindow.Add(new WebMessage("Customer", customer.ToString(), ConsoleColor.Green));
         }
-            
+
         public static void SystemMessage(string message)
         {
             mainWindow.Add(new WebMessage("System", message));
