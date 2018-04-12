@@ -33,18 +33,15 @@ namespace SQL_CRM
             Action<SqlCommand> setParameters = null;
 
             var sql = "SELECT [Product].Id, [Product].Name " +
-                      "FROM Product";
+                      "FROM Product ";
 
-            if (product != null)
+            if (product?.Name != null)
             {
-                if (product.Name != null)
+                sql += "WHERE Product.Name LIKE %@Name%";
+                setParameters += (command) =>
                 {
-                    where.Add("Product.Name = @Name");
-                    setParameters += (command) =>
-                    {
-                        command.Parameters.Add(new SqlParameter("Name", product.Name));
-                    };
-                }
+                    command.Parameters.Add(new SqlParameter("Name", product.Name));
+                };
             }
 
             Query(sql, (command) =>
@@ -109,8 +106,36 @@ namespace SQL_CRM
             });
         }
 
+        public List<ICustomer> GetAllCustomer(IProduct product)
+        {
+            var customers = new List<ICustomer>();
 
-        private IProduct CreateProductFromSqlReader(SqlDataReader reader)
+            if (product?.Id != null)
+            {
+                var sql = $"SELECT Customer.[Id], Customer.[FirstName], Customer.[LastName]" +
+                          $"FROM CustomerLikesProduct " +
+                          $"INNER JOIN Customer ON CustomerLikesProduct.CustomerId = Customer.Id " +
+                          $"WHERE CustomerLikesProduct.ProductId = @ProductId";
+
+                Query(sql,
+                    (command) =>
+                    {
+                        command.Parameters.Add(new SqlParameter("ProductId", product.Id));
+
+                        var reader = command.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            customers.Add(CustomerDbManager.CreateCustomerFromSqlReader(reader));
+                        }
+
+                    });
+
+            }
+
+            return customers;
+        }
+        public  static IProduct CreateProductFromSqlReader(SqlDataReader reader)
         {
             var id = reader.GetInt32(0);
             var name = reader.GetString(1);

@@ -250,7 +250,38 @@ namespace SQL_CRM
             return Read(null);
         }
 
-        private static ICustomer CreateCustomerFromSqlReader(SqlDataReader reader)
+        public List<IProduct> GetAllProducts(ICustomer customer)
+        {
+            var produtcts = new List<IProduct>();
+
+            if (customer?.CustomerId != null)
+            {
+                var sql = $"SELECT [Product].[Name], [Product].[Id] " +
+                          $"FROM CustomerLikesProduct " +
+                          $"LEFT JOIN Product ON CustomerLikesProduct.ProductId = Product.Id " +
+                          $"WHERE CustomerLikesProduct.CustomerId = @CustomerId";
+
+                Query(sql,
+                    (command) =>
+                    {
+                        command.Parameters.Add(new SqlParameter("CustomerId", customer.CustomerId));
+
+                        var reader = command.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            produtcts.Add(ProductDbManager.CreateProductFromSqlReader(reader));
+                        }
+
+                    });
+
+            }
+
+            return produtcts;
+        }
+
+        
+        public static ICustomer CreateCustomerFromSqlReader(SqlDataReader reader)
         {
             string email = null;
             string phoneNumber = null;

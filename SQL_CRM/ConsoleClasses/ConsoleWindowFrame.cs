@@ -44,6 +44,15 @@ namespace SQL_CRM
             Add(new WebMessage(""));
         }
 
+        public void SystemMessage(string message)
+        {
+            Add(new WebMessage("System", message));
+        }
+        public void ErrorMessage(string message)
+        {
+            Add(new WebMessage("Error", message, ConsoleColor.Red));
+        }
+
         public void StartRender()
         {
             _renderThread = new ThreadWraper(Render);
