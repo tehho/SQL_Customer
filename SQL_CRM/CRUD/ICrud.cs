@@ -4,7 +4,7 @@ namespace SQL_CRM
 {
     public interface ICrud<T>
     {
-        string Create(T obj);
+        void Create(T obj);
         List<T> Read(T obj);
         void Update(T obj);
         void Delete(T obj);
