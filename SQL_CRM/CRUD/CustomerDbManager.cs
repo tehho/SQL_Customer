@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SQL_CRM
 {
-    public class CustomerDbManager : DbManager, ICustomerDbManager, ICrud<ICustomer>
+    public class CustomerDbManager : DbManager, ICustomerDbManager
     {
         public CustomerDbManager(string conString) : base(conString)
         {
