@@ -6,7 +6,7 @@ namespace SQL_CRM
 {
     public class ProductDbManager : DbManager, IProductDbManager
     {
-        public ProductDbManager(string conString) : base(conString)
+        public ProductDbManager(string connectionString) : base(connectionString)
         {
         }
 

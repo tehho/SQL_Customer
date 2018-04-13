@@ -16,7 +16,7 @@ namespace SQL_CRM
         {
             var mainQuestion = new Question("Skriv in ett val", "Skapa en produkt,Skapa", "Visa alla produkter,Visa", "Ändra en produkt,Ändra", "Tabort en produkt,Tabort", "Tillbaka");
 
-            var input = _mainWindow.GetInputWithQuestion(mainQuestion);
+            var input = MainWindow.GetInputWithQuestion(mainQuestion);
 
             if (input == "Skapa en produkt")
             {
@@ -38,25 +38,25 @@ namespace SQL_CRM
 
         public override void Create()
         {
-            _mainWindow.SystemMessage("Skapa en produkt!");
+            MainWindow.SystemMessage("Skapa en produkt!");
 
-            var name = _mainWindow.GetInputWithQuestion("Skriv in produktens namn:");
+            var name = MainWindow.GetInputWithQuestion("Skriv in produktens namn:");
 
             var product = new Product()
             {
                 Name = name
             };
 
-            _dbManager.Create(product);
+            DbManager.Create(product);
 
-            _mainWindow.SystemMessage($"Ny produkt skapad {product}");
+            MainWindow.SystemMessage($"Ny produkt skapad {product}");
         }
 
         public override void ReadAll()
         {
-            _mainWindow.SystemMessage("Hämtar alla produkter:");
+            MainWindow.SystemMessage("Hämtar alla produkter:");
 
-            var list = _dbManager.Read(null);
+            var list = DbManager.Read(null);
 
             foreach (var product in list)
             {
@@ -66,49 +66,49 @@ namespace SQL_CRM
 
         public override void Update()
         {
-            _mainWindow.SystemMessage("Ändra en produkt");
+            MainWindow.SystemMessage("Ändra en produkt");
 
             var product = Find();
 
             if (product != null)
             {
-                _mainWindow.SystemMessage("Hittat kund:");
+                MainWindow.SystemMessage("Hittat kund:");
                 Program.Print(product);
 
                 var newproduct = new Product()
                 {
                     Id = product.Id,
-                    Name = _mainWindow.GetInputWithQuestion("Vilket namn har produkten")
+                    Name = MainWindow.GetInputWithQuestion("Vilket namn har produkten")
                 };
 
-                _dbManager.Update(product);
+                DbManager.Update(product);
 
 
-                _mainWindow.SystemMessage("Ändrat värden:");
-                _mainWindow.SystemMessage($"Namn: {product.Name} -> {newproduct.Name}");
+                MainWindow.SystemMessage("Ändrat värden:");
+                MainWindow.SystemMessage($"Namn: {product.Name} -> {newproduct.Name}");
             }
             else
             {
-                _mainWindow.ErrorMessage("No product found");
+                MainWindow.ErrorMessage("No product found");
             }
         }
 
         public override void Delete()
         {
-            _mainWindow.SystemMessage("Tabort en produkt");
+            MainWindow.SystemMessage("Tabort en produkt");
 
             var product = Find();
-            _dbManager.Delete(product);
+            DbManager.Delete(product);
 
-            _mainWindow.SystemMessage("Tog bort produkt:");
+            MainWindow.SystemMessage("Tog bort produkt:");
             Program.Print(product);
         }
 
         public override IProduct Find()
         {
-            var productname = _mainWindow.GetInputWithQuestion("Vilken produkt söker du");
+            var productname = MainWindow.GetInputWithQuestion("Vilken produkt söker du");
 
-            var list = _dbManager.Read(new Product()
+            var list = DbManager.Read(new Product()
             {
                 Name = productname
             });
@@ -132,37 +132,37 @@ namespace SQL_CRM
 
                             return ret;
                         }).ToList();
-                    var input = _mainWindow.GetInputWithQuestion(new Question("Vilken rodukt vill du välja", temp_List.ToArray()));
+                    var input = MainWindow.GetInputWithQuestion(new Question("Vilken rodukt vill du välja", temp_List.ToArray()));
 
                     var product = list.Find((item) => item.ToString() == input);
                     return product;
                 }
                 catch (FormatException e)
                 {
-                    _mainWindow.ErrorMessage("Not a valid input");
+                    MainWindow.ErrorMessage("Not a valid input");
                 }
             }
         }
         
         public void ReadAllCustomersThatLikesProduct()
         {
-            _mainWindow.SystemMessage("Hämta en produkt");
+            MainWindow.SystemMessage("Hämta en produkt");
 
             var product = Find();
 
-            _mainWindow.SystemMessage($"Hämtar kunder som gillar {product.Name}...");
+            MainWindow.SystemMessage($"Hämtar kunder som gillar {product.Name}...");
 
-            var customers = ((ProductDbManager)_dbManager).GetAllCustomer(product);
+            var customers = ((ProductDbManager)DbManager).GetAllCustomer(product);
 
-            _mainWindow.SystemMessage($"Produktkunderna gillar:");
+            MainWindow.SystemMessage($"Produktkunderna gillar:");
 
             Program.Print(product);
 
-            _mainWindow.AddSeparator();
+            MainWindow.AddSeparator();
 
             if (customers.Count == 0)
             {
-                _mainWindow.SystemMessage("Inga kunder hittades");
+                MainWindow.SystemMessage("Inga kunder hittades");
             }
             else
             {

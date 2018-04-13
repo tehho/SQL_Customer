@@ -5,18 +5,18 @@ namespace SQL_CRM
 {
     public class DbManager
     {
-        private string ConString { get; set; }
+        public string ConnectionString { get; set; }
 
-        public DbManager(string conString)
+        public DbManager(string connectionString)
         {
-            ConString = conString;
+            ConnectionString = connectionString;
         }
 
         public void Query(string sqlQuery, Action<SqlCommand> method)
         {
 
 
-            using (SqlConnection con = new SqlConnection(ConString))
+            using (SqlConnection con = new SqlConnection(ConnectionString))
             using (SqlCommand command = new SqlCommand(sqlQuery, con))
             {
                 con.Open();

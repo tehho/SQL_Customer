@@ -8,7 +8,7 @@ namespace SQL_CRM
 {
     public class CustomerDbManager : DbManager, ICustomerDbManager
     {
-        public CustomerDbManager(string conString) : base(conString)
+        public CustomerDbManager(string connectionString) : base(connectionString)
         {
 
         }
