@@ -15,17 +15,31 @@ namespace SQL_CRM
 
         public static void Main(string[] args)
         {
-            _customerDbManager =
-                new CustomerDbManager(System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"].ConnectionString);
 
-            _productDbManager = 
-                new ProductDbManager(System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"].ConnectionString);
+
 
 
             MainWindow.Width = 115;
             MainWindow.Height = 25;
 
             MainWindow.StartRender();
+
+            string connectionString;
+            var input = MainWindow.GetInputWithQuestion("Vill du koppla upp mot Azure?").ToLower();
+            if (input == "ja" ||
+                input == "azure")
+                connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"]
+                    .ConnectionString;
+            else
+                connectionString = "Server = localdb/mssqllocaldb; Database=KundregisterAndreasOVictor; Trusted Connection = true; UID = CustomerWriter; PWD = 1234test_!";
+            
+
+            _customerDbManager =
+                new CustomerDbManager(connectionString);
+
+            _productDbManager =
+                new ProductDbManager(connectionString);
+
 
             var customerGui = new CustomerGui(MainWindow);
             var productGui = new ProductGui(MainWindow);
@@ -38,7 +52,7 @@ namespace SQL_CRM
             {
                 try
                 {
-                    var input = MainWindow.GetInputWithQuestion(mainQuestion);
+                    input = MainWindow.GetInputWithQuestion(mainQuestion);
 
                     if (input == "Administrera en kund")
                     {
