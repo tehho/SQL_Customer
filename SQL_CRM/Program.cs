@@ -15,10 +15,6 @@ namespace SQL_CRM
 
         public static void Main(string[] args)
         {
-
-
-
-
             MainWindow.Width = 115;
             MainWindow.Height = 25;
 
