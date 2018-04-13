@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
+using SQL_CRM.DataObjects;
 
-namespace SQL_CRM
+namespace SQL_CRM.CRUD
 {
     public class CustomerDbManager : DbManager, ICustomerDbManager
     {
@@ -284,7 +284,6 @@ namespace SQL_CRM
 
             return produtcts;
         }
-
         
         public static ICustomer CreateCustomerFromSqlReader(SqlDataReader reader)
         {

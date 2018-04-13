@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-namespace SQL_CRM
+namespace SQL_CRM.DataObjects
 {
     public class Customer : ICustomer
     {
@@ -28,8 +29,7 @@ namespace SQL_CRM
         }
 
         public string FullName => $"{FirstName} {LastName}";
-
-
+        
         public string Email
         {
             get => _email;
@@ -71,6 +71,7 @@ namespace SQL_CRM
         }
 
         public string AddPhoneNumber { set => _phoneNr.Add(value.Trim()); }
+
         public string AddProduct
         {
             set => _likedProducts.Add(new Product { Name = value });
@@ -133,6 +134,11 @@ namespace SQL_CRM
         public Customer(string firstName, string lastName, string email, string phoneNumber)
             : this(null, firstName, lastName, email, phoneNumber, null)
         {
+        }
+
+        public WebMessage Print()
+        {
+            return new WebMessage("Customer", ToString(), ConsoleColor.Green);
         }
 
         public override string ToString()

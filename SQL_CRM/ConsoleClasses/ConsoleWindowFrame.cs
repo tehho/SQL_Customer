@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
-namespace SQL_CRM
+namespace SQL_CRM.ConsoleClasses
 {
     public class ConsoleWindowFrame
     {
@@ -48,6 +47,7 @@ namespace SQL_CRM
         {
             Add(new WebMessage("System", message));
         }
+
         public void ErrorMessage(string message)
         {
             Add(new WebMessage("Error", message, ConsoleColor.Red));
@@ -90,62 +90,7 @@ namespace SQL_CRM
             _needToReRender = true;
         }
 
-        private void RenderDisplay()
-        {
-            Console.SetCursorPosition(1, 1);
-
-            var temp = new Queue<WebMessage>(Messages);
-
-            foreach (var message in temp)
-            {
-                if (message.Color != null)
-                    Console.ForegroundColor = message.Color.Value;
-                Console.WriteLine(message.ToString().FitTo(Width - 2));
-                Console.CursorLeft = 1;
-                if (message.Color != null)
-                    Console.ResetColor();
-            }
-        }
-
-        private void RenderInput()
-        {
-            Console.SetCursorPosition(1, Height + 1);
-            Console.WriteLine(_question);
-
-            Console.CursorLeft = 1;
-            Console.WriteLine(_input);
-        }
-
-        void ResetDisplay()
-        {
-            Console.SetCursorPosition(0, 0);
-
-            DrawRow("+", "-");
-
-            for (int i = 0; i < Height; i++)
-            {
-                DrawRow("|", " ");
-            }
-
-            DrawRow("+", "-");
-
-        }
-
-        void ResetInput()
-        {
-            Console.SetCursorPosition(0, Height);
-
-            DrawRow("+", "-");
-
-            for (int i = 0; i < 2; i++)
-            {
-                DrawRow("|", " ");
-            }
-
-            DrawRow("+", "-");
-        }
-
-        void DrawRow(string edge, string content)
+        private void DrawRow(string edge, string content)
         {
             string temp = edge;
             for (int i = 0; i < Width; i++)
@@ -181,9 +126,9 @@ namespace SQL_CRM
             {
                 try
                 {
-                    for (var i = 0; i < question.answers.Count; i++)
+                    for (var i = 0; i < question.PossibleAnswers.Count; i++)
                     {
-                        Add(new WebMessage( $"{i + 1}. {question.answers[i].answer}"));
+                        Add(new WebMessage( $"{i + 1}. {question.PossibleAnswers[i].answer}"));
                     }
 
                     _needToReRender = true;
@@ -233,7 +178,60 @@ namespace SQL_CRM
 
             return ret;
         }
+        
+        private void RenderDisplay()
+        {
+            Console.SetCursorPosition(1, 1);
 
+            var temp = new Queue<WebMessage>(Messages);
 
+            foreach (var message in temp)
+            {
+                if (message.Color != null)
+                    Console.ForegroundColor = message.Color.Value;
+                Console.WriteLine(message.ToString().FitTo(Width - 2));
+                Console.CursorLeft = 1;
+                if (message.Color != null)
+                    Console.ResetColor();
+            }
+        }
+
+        private void RenderInput()
+        {
+            Console.SetCursorPosition(1, Height + 1);
+            Console.WriteLine(_question);
+
+            Console.CursorLeft = 1;
+            Console.WriteLine(_input);
+        }
+
+        private void ResetDisplay()
+        {
+            Console.SetCursorPosition(0, 0);
+
+            DrawRow("+", "-");
+
+            for (int i = 0; i < Height; i++)
+            {
+                DrawRow("|", " ");
+            }
+
+            DrawRow("+", "-");
+
+        }
+
+        private void ResetInput()
+        {
+            Console.SetCursorPosition(0, Height);
+
+            DrawRow("+", "-");
+
+            for (int i = 0; i < 2; i++)
+            {
+                DrawRow("|", " ");
+            }
+
+            DrawRow("+", "-");
+        }
     }
 }

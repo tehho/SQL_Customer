@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 
-namespace SQL_CRM
+namespace SQL_CRM.CRUD
 {
     public class DbManager
     {
@@ -14,8 +14,6 @@ namespace SQL_CRM
 
         public void Query(string sqlQuery, Action<SqlCommand> method)
         {
-
-
             using (SqlConnection con = new SqlConnection(ConnectionString))
             using (SqlCommand command = new SqlCommand(sqlQuery, con))
             {

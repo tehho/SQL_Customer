@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using SQL_CRM.DataObjects;
 
-namespace SQL_CRM
+namespace SQL_CRM.CRUD
 {
     public interface ICustomerDbManager : ICrud<ICustomer>
     {

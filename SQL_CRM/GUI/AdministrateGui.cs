@@ -1,4 +1,7 @@
-﻿namespace SQL_CRM
+﻿using SQL_CRM.ConsoleClasses;
+using SQL_CRM.CRUD;
+
+namespace SQL_CRM
 {
     public abstract class AdministrateGui<T>
     {

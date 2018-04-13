@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using SQL_CRM.DataObjects;
 
-namespace SQL_CRM
+namespace SQL_CRM.CRUD
 {
     public interface IProductDbManager : ICrud<IProduct>
     {
-        void Create(IProduct product);
-        List<IProduct> Read(IProduct product);
-        void Update(IProduct product);
-        void Delete(IProduct product);
         void Query(string sqlQuery, Action<SqlCommand> method);
     }
 }

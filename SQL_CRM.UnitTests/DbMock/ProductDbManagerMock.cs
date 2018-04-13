@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using SQL_CRM.CRUD;
+using SQL_CRM.DataObjects;
 
 namespace SQL_CRM.UnitTests
 {

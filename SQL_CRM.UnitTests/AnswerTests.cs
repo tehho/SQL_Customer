@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SQL_CRM.ConsoleClasses;
 
 namespace SQL_CRM.UnitTests
 {
@@ -10,10 +11,10 @@ namespace SQL_CRM.UnitTests
         [TestMethod]
         public void TestConstructor_ShouldSucceed()
         {
-            Assert.AreEqual(3, answer.possibleAnswers.Count);
-            Assert.AreEqual("Test", answer.possibleAnswers[0]);
-            Assert.AreEqual("Testsson", answer.possibleAnswers[1]);
-            Assert.AreEqual("Another Test", answer.possibleAnswers[2]);
+            Assert.AreEqual(3, answer.PossibleAnswers.Count);
+            Assert.AreEqual("Test", answer.PossibleAnswers[0]);
+            Assert.AreEqual("Testsson", answer.PossibleAnswers[1]);
+            Assert.AreEqual("Another Test", answer.PossibleAnswers[2]);
         }
 
         [TestMethod]
@@ -21,7 +22,7 @@ namespace SQL_CRM.UnitTests
         {
             var emptyAnswer = new Answer(" ");
 
-            Assert.AreEqual(0, emptyAnswer.possibleAnswers.Count);
+            Assert.AreEqual(0, emptyAnswer.PossibleAnswers.Count);
         }
 
         [TestMethod]

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SQL_CRM
+namespace SQL_CRM.CRUD
 {
     public interface ICrud<T>
     {

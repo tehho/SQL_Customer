@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
+using SQL_CRM.ConsoleClasses;
+using SQL_CRM.DataObjects;
 
-namespace SQL_CRM
+namespace SQL_CRM.GUI
 {
     public class ProductGui : AdministrateGui<IProduct>
     {
-
         public ProductGui(ConsoleWindowFrame mainWindow)
             : base(mainWindow,
                 new ProductDbManager(System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"].ConnectionString))
@@ -60,7 +61,7 @@ namespace SQL_CRM
 
             foreach (var product in list)
             {
-                Program.Print(product);
+                MainWindow.Add(product.Print());
             }
         }
 
@@ -73,7 +74,7 @@ namespace SQL_CRM
             if (product != null)
             {
                 MainWindow.SystemMessage("Hittat kund:");
-                Program.Print(product);
+                MainWindow.Add(product.Print());
 
                 var newproduct = new Product()
                 {
@@ -101,7 +102,7 @@ namespace SQL_CRM
             DbManager.Delete(product);
 
             MainWindow.SystemMessage("Tog bort produkt:");
-            Program.Print(product);
+            MainWindow.Add(product.Print());
         }
 
         public override IProduct Find()
@@ -156,7 +157,7 @@ namespace SQL_CRM
 
             MainWindow.SystemMessage($"Produktkunderna gillar:");
 
-            Program.Print(product);
+            MainWindow.Add(product.Print());
 
             MainWindow.AddSeparator();
 
@@ -168,7 +169,7 @@ namespace SQL_CRM
             {
                 foreach (var customer in customers)
                 {
-                    Program.Print(customer);
+                    MainWindow.Add(customer.Print());
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using SQL_CRM.DataObjects;
 
 namespace SQL_CRM.UnitTests
 {

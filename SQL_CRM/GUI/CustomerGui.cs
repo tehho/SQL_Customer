@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
+using SQL_CRM.ConsoleClasses;
+using SQL_CRM.CRUD;
+using SQL_CRM.DataObjects;
 
-namespace SQL_CRM
+namespace SQL_CRM.GUI
 {
     public class CustomerGui : AdministrateGui<ICustomer>
     {
-        
         public CustomerGui(ConsoleWindowFrame mainWindow)
             : base(mainWindow,
                 new CustomerDbManager(System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"].ConnectionString))
@@ -81,7 +81,7 @@ namespace SQL_CRM
             {
                 foreach (var x in products)
                 {
-                    Program.Print(x);
+                    MainWindow.Add(x.Print());
                 }
 
                 var input = MainWindow.GetInputWithQuestion("Vilken produkt gillar kunden:");
@@ -119,7 +119,7 @@ namespace SQL_CRM
 
             MainWindow.SystemMessage($"Kund {customer} gillar:");
 
-            Program.Print(customer);
+            MainWindow.Add(customer.Print());
 
             MainWindow.AddSeparator();
 
@@ -131,7 +131,7 @@ namespace SQL_CRM
             {
                 foreach (var product in products)
                 {
-                    Program.Print(product);
+                    MainWindow.Add(product.Print());
                 }
             }
         }
@@ -160,7 +160,7 @@ namespace SQL_CRM
 
             foreach (var customer in list)
             {
-                Program.Print(customer);
+                MainWindow.Add(customer.Print());
             }
         }
 
@@ -173,7 +173,7 @@ namespace SQL_CRM
             if (customer != null)
             {
                 MainWindow.SystemMessage("Hittat kund:");
-                Program.Print(customer);
+                MainWindow.Add(customer.Print());
 
                 var newcustomer = ChangeCustomer(customer);
 
@@ -205,7 +205,7 @@ namespace SQL_CRM
             DbManager.Delete(customer);
 
             MainWindow.SystemMessage("Tog bort kund:");
-            Program.Print(customer);
+            MainWindow.Add(customer.Print());
         }
 
         private void AddPhoneNr()
@@ -274,6 +274,7 @@ namespace SQL_CRM
                 }
             }
         }
+
         private ICustomer Fill(string question, string exit)
         {
             Customer customer = new Customer();
@@ -304,15 +305,14 @@ namespace SQL_CRM
 
             return customer;
         }
+
         private ICustomer ChangeCustomer(ICustomer customer)
         {
-            Program.Print(customer);
+            MainWindow.Add(customer.Print());
 
             var ret = Fill("Vad vill du ändra, spara ändringarna med Ändra", "Ändra");
             ret.CustomerId = customer.CustomerId;
             return ret;
         }
-
-
     }
 }

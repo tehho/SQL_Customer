@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Deployment.Application;
-using System.Linq;
+using SQL_CRM.ConsoleClasses;
+using SQL_CRM.CRUD;
+using SQL_CRM.DataObjects;
+using SQL_CRM.GUI;
 
 namespace SQL_CRM
 {
     public class Program
     {
-        static readonly ConsoleWindowFrame _mainWindow = new ConsoleWindowFrame();
+        private static readonly ConsoleWindowFrame MainWindow = new ConsoleWindowFrame();
 
         private static CustomerDbManager _customerDbManager;
         private static ProductDbManager _productDbManager;
@@ -20,13 +22,13 @@ namespace SQL_CRM
                 new ProductDbManager(System.Configuration.ConfigurationManager.ConnectionStrings["Kundregister"].ConnectionString);
 
 
-            _mainWindow.Width = 115;
-            _mainWindow.Height = 25;
+            MainWindow.Width = 115;
+            MainWindow.Height = 25;
 
-            _mainWindow.StartRender();
+            MainWindow.StartRender();
 
-            var customerGui = new CustomerGui(_mainWindow);
-            var productGui = new ProductGui(_mainWindow);
+            var customerGui = new CustomerGui(MainWindow);
+            var productGui = new ProductGui(MainWindow);
 
             var running = true;
 
@@ -36,7 +38,7 @@ namespace SQL_CRM
             {
                 try
                 {
-                    var input = _mainWindow.GetInputWithQuestion(mainQuestion);
+                    var input = MainWindow.GetInputWithQuestion(mainQuestion);
 
                     if (input == "Administrera en kund")
                     {
@@ -48,38 +50,38 @@ namespace SQL_CRM
                     }
                     else if (input == "Rensa skärmen")
                     {
-                        _mainWindow.Clear();
+                        MainWindow.Clear();
                     }
                     else if (input == "Avsluta")
                     {
                         running = false;
                     }
-                    _mainWindow.AddSeparator();
+                    MainWindow.AddSeparator();
                 }
                 catch (Exception e)
                 {
-                    _mainWindow.ErrorMessage(e.Message);
+                    MainWindow.ErrorMessage(e.Message);
                 }
             }
 
-            _mainWindow.PressAnyKeyToContinue();
+            MainWindow.PressAnyKeyToContinue();
 
-            _mainWindow.Abort();
+            MainWindow.Abort();
         }
         
         public static void Print(ICustomer customer)
         {
-            _mainWindow.Add(new WebMessage("Customer", customer.ToString(), ConsoleColor.Green));
+            MainWindow.Add(new WebMessage("Customer", customer.ToString(), ConsoleColor.Green));
         }
 
         public static void Print(IProduct product)
         {
-            _mainWindow.Add(new WebMessage("Product", product.ToString(), ConsoleColor.Yellow));
+            MainWindow.Add(new WebMessage("Product", product.ToString(), ConsoleColor.Yellow));
         }
 
         public static void ErrorMessage(string message)
         {
-            _mainWindow.ErrorMessage(message);
+            MainWindow.ErrorMessage(message);
         }
 
     }
